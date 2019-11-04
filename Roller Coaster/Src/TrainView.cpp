@@ -3,7 +3,10 @@
 TrainView::TrainView(QWidget *parent) :  
 QGLWidget(parent)  
 {  
+
 	resetArcball();
+
+	m = new Model("C:/Users/KaiHao/Desktop/Computer Graphics/DGMM-Lab/P3/arrow.obj", 100, Point3d(0, 0, 0));
 	
 }  
 TrainView::~TrainView()  
@@ -40,6 +43,7 @@ void TrainView:: resetArcball()
 
 void TrainView::paintGL()
 {
+	
 
 	//*********************************************************************
 	//
@@ -153,6 +157,9 @@ void TrainView::paintGL()
 		//Call square's render function, pass ModelViewMatrex and ProjectionMatrex
 		square->Paint(ProjectionMatrex,ModelViewMatrex);
 	square->End();
+
+
+	m->render(false, false);
 }
 
 //************************************************************************
