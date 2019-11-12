@@ -2,7 +2,8 @@
 #define TRAINVIEW_H  
 #include <QGLWidget> 
 #include <QtGui>  
-#include <QtOpenGL>  
+#include <QtOpenGL>
+#include <QVector3D>
 #include <GL/GLU.h>
 #pragma comment(lib,"opengl32.lib")
 #pragma comment(lib,"glu32.lib") 
@@ -41,7 +42,12 @@ public:
 	// all of the actual drawing happens in this routine
 	// it has to be encapsulated, since we draw differently if
 	// we're drawing shadows (no colors, for example)
+	// 畫軌道
 	void drawStuff(bool doingShadows=false);
+
+	// 畫火車
+	//void drawTrain(QVector3D trainPos, QVector3D trainUp, QVector3D trainDir);
+	void drawTrain();
 
 	// setup the projection - assuming that the projection stack has been
 	// cleared for you
@@ -65,7 +71,7 @@ public:
 
 	int camera; //相機視角
 	int curve; //曲線型態  0:"Linear"、1:"Cardinal"、2:"Cubic" 
-	int track; //軌道型態
+	int track; //軌道型態  0:"Line"  1:"Track"  2:"Road"  
 	bool isrun;
 	Triangle* triangle;
 	Square* square;
@@ -75,5 +81,7 @@ public:
 
 	Model *m;
 
+private:
+	inline void glVertexQVector3D(QVector3D v);
 };  
 #endif // TRAINVIEW_H  

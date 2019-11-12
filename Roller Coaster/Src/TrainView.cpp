@@ -32,6 +32,12 @@ void TrainView::initializeTexture()
 	QOpenGLTexture* texture = new QOpenGLTexture(QImage("./Textures/Tupi.bmp"));
 	Textures.push_back(texture);
 }
+
+inline void TrainView::glVertexQVector3D(QVector3D v)
+{
+	glVertex3f(v.x(), v.y(), v.z());
+}
+
 void TrainView::resetArcball()
 //========================================================================
 {
@@ -167,6 +173,8 @@ void TrainView::paintGL()
 
 	glColor4f(1, 0, 0, 1);
 	m->render(false, false);
+
+	drawTrain();
 }
 
 //************************************************************************
@@ -276,7 +284,7 @@ void TrainView::drawStuff(bool doingShadows)
 	// TODO: 
 	// call your own track drawing code
 	//####################################################################
-
+/*
 	//float t_time;
 	unsigned int DIVIDE_LINE = 2; //有幾條線
 
@@ -333,7 +341,7 @@ void TrainView::drawStuff(bool doingShadows)
 		glLineWidth(1);
 
 	}
-
+*/
 
 
 #ifdef EXAMPLE_SOLUTION
@@ -353,7 +361,136 @@ void TrainView::drawStuff(bool doingShadows)
 	if (!tw->trainCam->value())
 		drawTrain(this, doingShadows);
 #endif
+
+	//####################################################################
+	// TODO: 
+	//	KaiHao's Code
+	//####################################################################
+
+	vector<Point3f> trackMiddle; //鐵軌的中間軌道點
+	vector<Point3f> trackLeft; //雙軌的左邊軌道點
+	vector<Point3f> trackRight; //雙軌的右邊軌道點
+
+	if (curve == 0) // "Linear"
+	{
+		for (size_t i = 0; i < m_pTrack->points.size(); ++i)
+		{
+			// 控制點的位置
+			Point3f _p1 = m_pTrack->points[i].pos;
+			Point3f _p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].pos;
+			QVector3D p1(_p1.x, _p1.y, _p1.z);
+			QVector3D p2(_p2.x, _p2.y, _p2.z);
+			QVector3D p1_p2(p2 - p1); //p1指向p2的向量
+			p1_p2.normalize();
+
+			// 控制點指向的方向
+			Point3f _d1 = m_pTrack->points[i].orient;
+			Point3f _d2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].orient;
+			QVector3D d1(_d1.x, _d1.y, _d1.z); d1.normalize();
+			QVector3D d2(_d2.x, _d2.y, _d2.z); d2.normalize();
+
+			//算左右延伸的兩點
+			const int trackWidth = 3;
+			QVector3D v1 = p1 + QVector3D::crossProduct(p1_p2, d1) * trackWidth;
+			QVector3D v2 = p1 - QVector3D::crossProduct(p1_p2, d1) * trackWidth;
+			QVector3D v3 = p2 + QVector3D::crossProduct(p1_p2, d2) * trackWidth;
+			QVector3D v4 = p2 - QVector3D::crossProduct(p1_p2, d2) * trackWidth;
+
+
+			if (track == 0)
+			{
+				glLineWidth(3);
+				glColor3ub(32, 32, 64);
+				glBegin(GL_LINES);
+				glVertexQVector3D(p1);
+				glVertexQVector3D(p2);
+				glEnd();
+			}
+			else if (track == 1)
+			{
+				glLineWidth(3);
+				glColor3ub(32, 32, 64);
+				glBegin(GL_LINES);
+				glVertexQVector3D(v1);
+				glVertexQVector3D(v3);
+				glVertexQVector3D(v2);
+				glVertexQVector3D(v4);
+				glEnd();
+			}
+			else if (track == 2)
+			{
+				const float roadThickness = 0.35;
+
+				glColor4f(0.05, 0.1, 0.3, 0.2);
+
+				glBegin(GL_QUADS); //連續畫
+				glVertexQVector3D(v1 + d1 * roadThickness);
+				glVertexQVector3D(v2 + d1 * roadThickness);
+				glVertexQVector3D(v4 + d2 * roadThickness);
+				glVertexQVector3D(v3 + d2 * roadThickness);
+				glVertexQVector3D(v3 - d2 * roadThickness);
+				glVertexQVector3D(v4 - d2 * roadThickness);
+				glVertexQVector3D(v2 - d1 * roadThickness);
+				glVertexQVector3D(v1 - d1 * roadThickness);
+				glVertexQVector3D(v1 + d1 * roadThickness);
+				glVertexQVector3D(v2 + d1 * roadThickness);
+				glEnd();
+
+				glBegin(GL_QUADS); //單獨畫
+				glVertexQVector3D(v1 + d1 * roadThickness);
+				glVertexQVector3D(v1 - d1 * roadThickness);
+				glVertexQVector3D(v3 - d2 * roadThickness);
+				glVertexQVector3D(v3 + d2 * roadThickness);
+
+				glVertexQVector3D(v2 + d1 * roadThickness);
+				glVertexQVector3D(v2 - d1 * roadThickness);
+				glVertexQVector3D(v4 - d2 * roadThickness);
+				glVertexQVector3D(v4 + d2 * roadThickness);
+				glEnd();
+			}
+		}
 	}
+}
+
+//void TrainView::drawTrain(QVector3D trainPos, QVector3D trainUp, QVector3D trainDir)
+void TrainView::drawTrain()
+{
+	//debug
+	QVector3D trainPos(0, 0, 0); //火車的位置
+	QVector3D trainUp(0, 1, 0);  //火車上方
+	QVector3D trainDire(1, 0, 0);  //火車的前方
+	QVector3D trainLeft(QVector3D::crossProduct(trainUp, trainDire));  //火車的左方
+	////////
+
+	const float trainSize = 5;
+	
+	trainUp.normalize();
+	trainDire.normalize(); 
+	trainLeft.normalize();
+	
+	trainPos += trainUp * trainSize;
+
+
+	//畫四角錐作為車頭
+	glColor3f(1, 1, 1);
+
+	glBegin(GL_TRIANGLE_FAN);
+	glVertexQVector3D(trainPos + trainDire * trainSize * 2);
+	glVertexQVector3D(trainPos+ trainUp * trainSize + trainLeft * trainSize);
+	glVertexQVector3D(trainPos + trainUp * trainSize - trainLeft * trainSize);
+	glVertexQVector3D(trainPos - trainUp * trainSize - trainLeft * trainSize);
+	glVertexQVector3D(trainPos - trainUp * trainSize + trainLeft * trainSize);
+	glVertexQVector3D(trainPos + trainUp * trainSize + trainLeft * trainSize);
+	glEnd();
+	glBegin(GL_TRIANGLE_FAN);
+	glVertexQVector3D(trainPos);
+	glVertexQVector3D(trainPos + trainUp * trainSize + trainLeft * trainSize);
+	glVertexQVector3D(trainPos + trainUp * trainSize - trainLeft * trainSize);
+	glVertexQVector3D(trainPos - trainUp * trainSize - trainLeft * trainSize);
+	glVertexQVector3D(trainPos - trainUp * trainSize + trainLeft * trainSize);
+	glVertexQVector3D(trainPos + trainUp * trainSize + trainLeft * trainSize);
+	glEnd();
+}
 
 void TrainView::
 doPick(int mx, int my)
