@@ -313,7 +313,7 @@ void AppMain::AddControlPoint()
 
 	// pick a reasonable location
 	size_t previdx = (newidx + npts -1) % npts;
-	Pnt3f npos = (this->m_Track.points[previdx].pos + this->m_Track.points[newidx].pos) * .5f;
+	Point3f npos = (this->m_Track.points[previdx].pos + this->m_Track.points[newidx].pos) * .5f;
 
 	this->m_Track.points.insert(this->m_Track.points.begin() + newidx,npos);
 
@@ -346,7 +346,7 @@ void AppMain::rollx(float dir)
 {
 	int s = this->trainview->selectedCube;
 	if (s >= 0) {
-		Pnt3f old = this->m_Track.points[s].orient;
+		Point3f old = this->m_Track.points[s].orient;
 		float si = sin(((float)M_PI_4) * dir);
 		float co = cos(((float)M_PI_4) * dir);
 		this->m_Track.points[s].orient.y = co * old.y - si * old.z;
@@ -370,7 +370,7 @@ void AppMain::rollz(float dir)
 	int s = this->trainview->selectedCube;
 	if (s >= 0) {
 
-		Pnt3f old = this->m_Track.points[s].orient;
+		Point3f old = this->m_Track.points[s].orient;
 
 		float si = sin(((float)M_PI_4) * dir);
 		float co = cos(((float)M_PI_4) * dir);

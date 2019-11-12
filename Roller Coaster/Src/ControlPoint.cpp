@@ -47,7 +47,7 @@ ControlPoint()
 // * Set up the position and set orientation to default (0, 1, 0)
 //============================================================================
 ControlPoint::
-ControlPoint(const Pnt3f &_pos) 
+ControlPoint(const Point3f &_pos) 
 	: pos(_pos), orient(0,1,0)
 //============================================================================
 {
@@ -58,7 +58,7 @@ ControlPoint(const Pnt3f &_pos)
 // * Set up the position and orientation
 //============================================================================
 ControlPoint::
-ControlPoint(const Pnt3f &_pos, const Pnt3f &_orient) 
+ControlPoint(const Point3f &_pos, const Point3f &_orient) 
 	: pos(_pos), orient(_orient)
 //============================================================================
 {

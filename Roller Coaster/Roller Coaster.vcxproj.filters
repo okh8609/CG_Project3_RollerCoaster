@@ -53,9 +53,6 @@
     <ClCompile Include="Src\AppMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Utilities\Pnt3f.cpp">
-      <Filter>Source Files\Utilities</Filter>
-    </ClCompile>
     <ClCompile Include="Src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -98,6 +95,12 @@
     <ClCompile Include="Src\Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Particle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Utilities\Point3f.cpp">
+      <Filter>Source Files\Utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="AppMain.ui">
@@ -116,9 +119,6 @@
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_AppMain.h">
       <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\Utilities\Pnt3f.H">
-      <Filter>Header Files\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="Include\Utilities\3DUtils.h">
       <Filter>Header Files\Utilities</Filter>
@@ -152,6 +152,12 @@
     </ClInclude>
     <ClInclude Include="Include\vector.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Particle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Utilities\Point3f.H">
+      <Filter>Header Files\Utilities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

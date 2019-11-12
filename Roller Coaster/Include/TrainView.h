@@ -12,6 +12,9 @@
 #include "Triangle.h"
 #include "Square.h"
 #include "Model.h"
+#include <iostream>
+
+#include "Particle.h"
 
 class AppMain;
 class CTrack;
@@ -58,11 +61,11 @@ public:
 	ArcBallCam		arcball;			// keep an ArcBall for the UI
 	int				selectedCube;  // simple - just remember which cube is selected
 
-	CTrack*			m_pTrack;		// The track of the entire scene
+	CTrack*			m_pTrack;		// The track of the entire scene 軌道儲存
 
-	int camera;
-	int curve;
-	int track;
+	int camera; //相機視角
+	int curve; //曲線型態  0:"Linear"、1:"Cardinal"、2:"Cubic" 
+	int track; //軌道型態
 	bool isrun;
 	Triangle* triangle;
 	Square* square;

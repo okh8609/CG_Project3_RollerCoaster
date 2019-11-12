@@ -180,6 +180,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Particle.cpp" />
     <ClCompile Include="Src\3DSLoader.cpp" />
     <ClCompile Include="Src\AppMain.cpp" />
     <ClCompile Include="Src\CBMPLoader.cpp" />
@@ -192,7 +193,7 @@
     <ClCompile Include="Src\Triangle.cpp" />
     <ClCompile Include="Src\Utilities\3DUtils.cpp" />
     <ClCompile Include="Src\Utilities\ArcBallCam.cpp" />
-    <ClCompile Include="Src\Utilities\Pnt3f.cpp" />
+    <ClCompile Include="Src\Utilities\Point3f.cpp" />
     <ClCompile Include="Src\vector.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -227,6 +228,7 @@
     <ClInclude Include="Include\Square.h" />
     <ClInclude Include="Include\Track.H" />
     <ClInclude Include="Include\vector.h" />
+    <ClInclude Include="Particle.h" />
     <CustomBuild Include="Include\TrainView.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
@@ -248,7 +250,7 @@
     <ClInclude Include="Include\Triangle.h" />
     <ClInclude Include="Include\Utilities\3DUtils.h" />
     <ClInclude Include="Include\Utilities\ArcBallCam.H" />
-    <ClInclude Include="Include\Utilities\Pnt3f.H" />
+    <ClInclude Include="Include\Utilities\Point3f.H" />
     <CustomBuild Include="Include\AppMain.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>

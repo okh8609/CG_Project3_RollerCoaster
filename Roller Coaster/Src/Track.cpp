@@ -47,10 +47,10 @@ resetPoints()
 {
 
 	points.clear();
-	points.push_back(ControlPoint(Pnt3f(50,5,0)));
-	points.push_back(ControlPoint(Pnt3f(0,5,50)));
-	points.push_back(ControlPoint(Pnt3f(-50,5,0)));
-	points.push_back(ControlPoint(Pnt3f(0,5,-50)));
+	points.push_back(ControlPoint(Point3f(50,5,0)));
+	points.push_back(ControlPoint(Point3f(0,5,50)));
+	points.push_back(ControlPoint(Point3f(-50,5,0)));
+	points.push_back(ControlPoint(Point3f(0,5,-50)));
 
 	// we had better put the train back at the start of the track...
 	trainU = 0.0;
@@ -124,7 +124,7 @@ readPoints(const char* filename)
 			points.clear();
 			// get lines until EOF or we have enough points
 			while( (points.size() < npts) && fgets(buf,512,fp) ) {
-				Pnt3f pos,orient;
+				Point3f pos,orient;
 				vector<const char*> words;
 				breakString(buf,words);
 				if (words.size() >= 3) {

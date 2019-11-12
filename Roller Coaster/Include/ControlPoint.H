@@ -25,7 +25,7 @@
 *************************************************************************/
 #pragma once
 
-#include "Utilities/Pnt3f.H"
+#include "Utilities/Point3f.H"
 
 class ControlPoint {
 	public:
@@ -34,15 +34,15 @@ class ControlPoint {
 		ControlPoint();					
 		
 		// create in a position
-		ControlPoint(const Pnt3f& pos);	
+		ControlPoint(const Point3f& pos);	
 
 		// Create in a position and orientation
-		ControlPoint(const Pnt3f& pos, const Pnt3f& orient);
+		ControlPoint(const Point3f& pos, const Point3f& orient);
 
 		// draw the control point - assumes the color is correct
 		void draw();
 
 	public:
-		Pnt3f pos;         // Position of this control point
-		Pnt3f orient;		 // Orientation of this control point
+		Point3f pos;         // Position of this control point
+		Point3f orient;		 // Orientation of this control point
 };
