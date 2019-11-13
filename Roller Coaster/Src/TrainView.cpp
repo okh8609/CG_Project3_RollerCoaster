@@ -8,6 +8,10 @@ TrainView::TrainView(QWidget *parent) :
 	resetArcball();
 
 	m = new Model("C:/Users/KaiHao/Desktop/Computer Graphics/DGMM-Lab/P3/arrow.obj", 100, Point3d(0, 0, 0));
+
+	//string path_02("C:/Users/KaiHao/Desktop/實驗室/3D身體調變/3D model obj file/obj_2/20190624_064424_262Y1Q6D.obj");
+	//MyObjLoader model_02(path_02, 9, QVector3D(-1.5, 1, 0));
+	//model = model_02;
 }
 TrainView::~TrainView()
 {}
@@ -173,6 +177,8 @@ void TrainView::paintGL()
 
 	glColor4f(1, 0, 0, 1);
 	m->render(false, false);
+
+	//model.render();
 
 	drawTrain();
 }
