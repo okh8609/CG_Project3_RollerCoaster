@@ -7,11 +7,12 @@ TrainView::TrainView(QWidget *parent) :
 
 	resetArcball();
 
-	m = new Model("C:/Users/KaiHao/Desktop/Computer Graphics/DGMM-Lab/P3/arrow.obj", 100, Point3d(0, 0, 0));
+	this->m = new Model("C:/Users/KaiHao/Desktop/Computer Graphics/DGMM-Lab/P3/arrow.obj", 100, Point3d(0, 0, 0));
+	//m = new Model("C:/Users/KaiHao/Desktop/實驗室/3D身體調變/3D model obj file/obj_2/20190624_064424_262Y1Q6D.obj", 100, Point3d(0, 0, 0));
 
-	//string path_02("C:/Users/KaiHao/Desktop/實驗室/3D身體調變/3D model obj file/obj_2/20190624_064424_262Y1Q6D.obj");
-	//MyObjLoader model_02(path_02, 9, QVector3D(-1.5, 1, 0));
-	//model = model_02;
+
+	string path("C:/Users/KaiHao/Desktop/實驗室/3D身體調變/3D model obj file/obj_2/20190624_064424_262Y1Q6D.obj");
+	this->model = MyObjLoader(path, 50, QVector3D(0, 35, 0));
 }
 TrainView::~TrainView()
 {}
@@ -142,6 +143,11 @@ void TrainView::paintGL()
 
 	drawStuff();
 
+	//畫人像OBJ
+	glColor3f(205.0 / 255.0, 149.0 / 255.0, 124.0 / 255.0);
+	glColor4f(0, 0.2, 0.5, 1);
+	model.render();
+
 	// this time drawing is for shadows (except for top view)
 	if (this->camera != 1) {
 		setupShadows();
@@ -169,17 +175,17 @@ void TrainView::paintGL()
 	square->Paint(ProjectionMatrex, ModelViewMatrex);
 	square->End();
 
-
-
-
+	//畫粒子
 	ProcessParticles();
 	DrawParticles();
 
-	glColor4f(1, 0, 0, 1);
+	//畫箭頭的OBJ
+	glColor4f(0, 0.5, 0.5, 1);
 	m->render(false, false);
 
-	//model.render();
 
+
+	//畫四角椎當火車頭   	 
 	drawTrain();
 }
 
@@ -254,7 +260,7 @@ setProjection()
 #endif
 		update();
 	}
-}
+	}
 
 //************************************************************************
 //
@@ -270,6 +276,7 @@ setProjection()
 //========================================================================
 void TrainView::drawStuff(bool doingShadows)
 {
+
 	// Draw the control points
 	// don't draw the control points if you're driving 
 	// (otherwise you get sea-sick as you drive through them)
@@ -456,6 +463,7 @@ void TrainView::drawStuff(bool doingShadows)
 			}
 		}
 	}
+
 }
 
 //void TrainView::drawTrain(QVector3D trainPos, QVector3D trainUp, QVector3D trainDir)
@@ -469,11 +477,11 @@ void TrainView::drawTrain()
 	////////
 
 	const float trainSize = 5;
-	
+
 	trainUp.normalize();
-	trainDire.normalize(); 
+	trainDire.normalize();
 	trainLeft.normalize();
-	
+
 	trainPos += trainUp * trainSize;
 
 
@@ -482,7 +490,7 @@ void TrainView::drawTrain()
 
 	glBegin(GL_TRIANGLE_FAN);
 	glVertexQVector3D(trainPos + trainDire * trainSize * 2);
-	glVertexQVector3D(trainPos+ trainUp * trainSize + trainLeft * trainSize);
+	glVertexQVector3D(trainPos + trainUp * trainSize + trainLeft * trainSize);
 	glVertexQVector3D(trainPos + trainUp * trainSize - trainLeft * trainSize);
 	glVertexQVector3D(trainPos - trainUp * trainSize - trainLeft * trainSize);
 	glVertexQVector3D(trainPos - trainUp * trainSize + trainLeft * trainSize);

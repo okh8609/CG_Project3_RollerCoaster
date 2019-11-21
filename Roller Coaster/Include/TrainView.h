@@ -81,7 +81,7 @@ public:
 	QVector<QOpenGLTexture*> Textures;
 
 	Model *m;
-	//MyObjLoader model;
+	MyObjLoader model;
 private:
 	inline void glVertexQVector3D(QVector3D v);
 };  

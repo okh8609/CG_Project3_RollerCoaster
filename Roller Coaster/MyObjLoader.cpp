@@ -63,6 +63,17 @@ void MyObjLoader::render() const
 	for (auto surface : all_surface)
 	{
 		glBegin(GL_POLYGON);
+
+		if (surface.size() >= 3)
+		{
+			const auto & a = all_vertex.at(surface.at(0));
+			const auto & b = all_vertex.at(surface.at(1));
+			const auto & c = all_vertex.at(surface.at(2));
+
+			auto n = QVector3D::normal(b - a, c - a);
+			glNormal3d(n.x(), n.y(), n.z());
+		}
+
 		for (size_t i = 0; i < surface.size(); i++)
 			glVertexVec3(all_vertex.at(surface.at(i)) * scale + _origin);
 		glEnd();
