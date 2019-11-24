@@ -334,9 +334,9 @@ void TrainView::drawStuff(bool doingShadows)
 	//	KaiHao's Code
 	//####################################################################
 
-	//vector<Point3f> trackMiddle; //鐵軌的中間軌道點
-	//vector<Point3f> trackLeft; //雙軌的左邊軌道點
-	//vector<Point3f> trackRight; //雙軌的右邊軌道點
+	vector<QVector3D> trackMiddle; //鐵軌的中間軌道點
+	vector<QVector3D> trackLeft; //雙軌的左邊軌道點
+	vector<QVector3D> trackRight; //雙軌的右邊軌道點
 
 	this->arcLength = 0; //總長度先設為0
 
@@ -423,22 +423,34 @@ void TrainView::drawStuff(bool doingShadows)
 			}
 		}
 	}
-	else if (curve == 1) // Cardinal
+	else if (curve == 1 || curve == 2)
 	{
-		const int NumIntegralDiv = 30; //Number of Integral Divide - 線段積分 總共切幾份
-		float tens = 0.5; // 矩陣的參數 tension = 0.01~1 (軌道彎曲程度)
-		QMatrix4x4 M(-1, 2, -1, 0,
-			2 / tens - 1, 1 - 3 / tens, 0, 1 / tens,
-			1 - 2 / tens, 3 / tens - 2, 1, 0,
-			1, -1, 0, 0);
-		M *= tens;
+		QMatrix4x4 M;
 
+		if (curve == 1) // Cardinal
+		{
+			float tens = 0.5; // 矩陣的參數 tension = 0.01~1 (軌道彎曲程度)
+			M = QMatrix4x4(-1, 2, -1, 0,
+				2 / tens - 1, 1 - 3 / tens, 0, 1 / tens,
+				1 - 2 / tens, 3 / tens - 2, 1, 0,
+				1, -1, 0, 0);
+			M *= tens;
+		}
+
+		if (curve == 2) // Cubic
+		{
+			M = QMatrix4x4(-1, 3, -3, 1,
+				3, -6, 0, 4,
+				-3, 3, 3, 1,
+				1, 0, 0, 0);
+			M /= 6.0;
+		}
 
 		for (size_t i = 0; i < m_pTrack->points.size(); ++i)
 		{
-			vector<QVector3D> trackMiddle; //鐵軌的中間軌道點
-			vector<QVector3D> trackLeft; //雙軌的左邊軌道點
-			vector<QVector3D> trackRight; //雙軌的右邊軌道點
+			vector<QVector3D> subTrackMiddle; //鐵軌的中間軌道點
+			vector<QVector3D> subTrackLeft; //雙軌的左邊軌道點
+			vector<QVector3D> subTrackRight; //雙軌的右邊軌道點
 
 			// 控制點的位置
 			Point3f _p0 = m_pTrack->points[(i - 1) % m_pTrack->points.size()].pos;
@@ -451,166 +463,165 @@ void TrainView::drawStuff(bool doingShadows)
 				0, 0, 0, 0);
 			QMatrix4x4 GxM = G * M;
 
-			// 控制點指向的方向
+			// 兩控制點指向的方向
 			Point3f _d1 = m_pTrack->points[i].orient;
 			Point3f _d2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].orient;
 			QVector3D d1(_d1.x, _d1.y, _d1.z); d1.normalize();
 			QVector3D d2(_d2.x, _d2.y, _d2.z); d2.normalize();
 
-			//繪製各線段(中)
-			glLineWidth(3);
-			glColor3ub(32, 32, 64);
-			glBegin(GL_LINE_STRIP);
+			//線段(中)
+			const int NumIntegralDiv = 30; //Number of Integral Divide - 線段積分 總共切幾份
 			QVector3D preQ(_p1.x, _p1.y, _p1.z); //
-			for (size_t i = 0; i <= NumIntegralDiv; ++i)
+			for (size_t i = 0; i < NumIntegralDiv; ++i)  //  <=  ???
 			{
 				float t = (float)i / (float)NumIntegralDiv; //整體進度 t = 0 ~ 1
 				QVector4D T(t*t*t, t*t, t, 1);
 
 				QVector4D _q = G * M * T;
 				QVector3D Q(_q.x(), _q.y(), _q.z());
-				if (track == 0) //單一條線的軌道
-					glVertexQVector3D(Q);
-				trackMiddle.push_back(Q);
+				subTrackMiddle.push_back(Q);
 
 				arcLength += (Q - preQ).length(); //
 				preQ = Q; //
 			}
-			glEnd();
+			trackMiddle.insert(trackMiddle.end(), subTrackMiddle.begin(), subTrackMiddle.end());
 
-			//繪製各線段 (左)
+			//線段 (左)
 			const int trackWidth = 3;
-			glLineWidth(3);
-			glColor3ub(32, 32, 64);
-			glBegin(GL_LINE_STRIP);
 			{ //第0個點
-				const QVector3D& pa = trackMiddle.at(0);
-				const QVector3D& pb = trackMiddle.at(1);
+				const QVector3D& pa = subTrackMiddle.at(0);
+				const QVector3D& pb = subTrackMiddle.at(1);
 				QVector3D d_ab = pb - pa; //a向b的方向
 
 				//算左延伸的點
-				trackLeft.push_back(pa + QVector3D::crossProduct(d1, d_ab).normalized() * trackWidth);
-				if (track == 1) //兩條線的軌道
-					glVertexQVector3D(trackLeft.back());
+				subTrackLeft.push_back(pa + QVector3D::crossProduct(d1, d_ab).normalized() * trackWidth);
 			}
-			for (size_t i = 1; i < trackMiddle.size(); ++i)
+			for (size_t i = 1; i < subTrackMiddle.size(); ++i)
 			{
 				// 角度 沒特別講，就用線性的吧
-				QVector3D dd = d1 + (d2 - d1) * i / trackMiddle.size();
+				QVector3D dd = d1 + (d2 - d1) * i / subTrackMiddle.size();
 				dd.normalize();
 
-				const QVector3D& pa = trackMiddle.at(i - 1);
-				const QVector3D& pb = trackMiddle.at(i);
+				const QVector3D& pa = subTrackMiddle.at(i - 1);
+				const QVector3D& pb = subTrackMiddle.at(i);
 				QVector3D d_ab = pb - pa; //a向b的方向
 
 				//算左延伸的點
-				trackLeft.push_back(pb + QVector3D::crossProduct(dd, d_ab).normalized() * trackWidth);
-				if (track == 1) //兩條線的軌道
-					glVertexQVector3D(trackLeft.back());
+				subTrackLeft.push_back(pb + QVector3D::crossProduct(dd, d_ab).normalized() * trackWidth);
 			}
-			glEnd();
+			trackLeft.insert(trackLeft.end(), subTrackLeft.begin(), subTrackLeft.end());
 
-			//繪製各線段 (右)
+			//繪線段 (右)
+			{ //第0個點
+				const QVector3D& pa = subTrackMiddle.at(0);
+				const QVector3D& pb = subTrackMiddle.at(1);
+				QVector3D d_ab = pb - pa; //a向b的方向
+
+				//算右延伸的點
+				subTrackRight.push_back(pa - QVector3D::crossProduct(d1, d_ab).normalized() * trackWidth);
+			}
+			for (size_t i = 1; i < subTrackMiddle.size(); ++i)
+			{
+				//角度沒特別講，就用線性的吧
+				QVector3D dd = d1 + (d2 - d1) * i / subTrackMiddle.size();
+				dd.normalize();
+
+				const QVector3D& pa = subTrackMiddle.at(i - 1);
+				const QVector3D& pb = subTrackMiddle.at(i);
+				QVector3D d_ab = pb - pa; //a向b的方向
+
+				//算右延伸的點
+				subTrackRight.push_back(pb - QVector3D::crossProduct(dd, d_ab).normalized() * trackWidth);
+			}
+			trackRight.insert(trackRight.end(), subTrackRight.begin(), subTrackRight.end());
+		}
+
+		//軌道型態  0:"Line"  1:"Track"  2:"Road"
+		if (track == 0) //單一條線的軌道
+		{
 			glLineWidth(3);
 			glColor3ub(32, 32, 64);
 			glBegin(GL_LINE_STRIP);
-			{ //第0個點
-				const QVector3D& pa = trackMiddle.at(0);
-				const QVector3D& pb = trackMiddle.at(1);
-				QVector3D d_ab = pb - pa; //a向b的方向
-
-				//算右延伸的點
-				trackRight.push_back(pa - QVector3D::crossProduct(d1, d_ab).normalized() * trackWidth);
-				if (track == 1) //兩條線的軌道
-					glVertexQVector3D(trackRight.back());
-			}
-			for (size_t i = 1; i < trackMiddle.size(); ++i)
-			{
-				//角度沒特別講，就用線性的吧
-				QVector3D dd = d1 + (d2 - d1) * i / trackMiddle.size();
-				dd.normalize();
-
-				const QVector3D& pa = trackMiddle.at(i - 1);
-				const QVector3D& pb = trackMiddle.at(i);
-				QVector3D d_ab = pb - pa; //a向b的方向
-
-				//算右延伸的點
-				trackRight.push_back(pb - QVector3D::crossProduct(dd, d_ab).normalized() * trackWidth);
-				if (track == 1) //兩條線的軌道
-					glVertexQVector3D(trackRight.back());
-			}
+			for (auto p : trackMiddle)
+				glVertexQVector3D(p);
+			glVertexQVector3D(trackMiddle.front());
 			glEnd();
-
-
-
-			////算左右延伸的兩點
-			//const int trackWidth = 3;
-			//QVector3D v1 = p1 + QVector3D::crossProduct(p1_p2, d1) * trackWidth;
-			//QVector3D v2 = p1 - QVector3D::crossProduct(p1_p2, d1) * trackWidth;
-			//QVector3D v3 = p2 + QVector3D::crossProduct(p1_p2, d2) * trackWidth;
-			//QVector3D v4 = p2 - QVector3D::crossProduct(p1_p2, d2) * trackWidth;
-
-			////軌道型態  0:"Line"  1:"Track"  2:"Road"
-			//if (track == 0) //單一條線的軌道
-			//{
-			//	glLineWidth(3);
-			//	glColor3ub(32, 32, 64);
-			//	glBegin(GL_LINES);
-			//	glVertexQVector3D(p1);
-			//	glVertexQVector3D(p2);
-			//	glEnd();
-			//}
-			//else if (track == 1) //兩條線的軌道
-			//{
-			//	glLineWidth(3);
-			//	glColor3ub(32, 32, 64);
-			//	glBegin(GL_LINES);
-			//	glVertexQVector3D(v1);
-			//	glVertexQVector3D(v3);
-			//	glVertexQVector3D(v2);
-			//	glVertexQVector3D(v4);
-			//	glEnd();
-			//}
-			//else if (track == 2) //鋪設軌道平面
-			//{
-			//	const float roadThickness = 0.35;
-
-			//	glColor4f(0.05, 0.1, 0.3, 0.2);
-
-			//	glBegin(GL_QUADS); //連續畫
-			//	glVertexQVector3D(v1 + d1 * roadThickness);
-			//	glVertexQVector3D(v2 + d1 * roadThickness);
-			//	glVertexQVector3D(v4 + d2 * roadThickness);
-			//	glVertexQVector3D(v3 + d2 * roadThickness);
-			//	glVertexQVector3D(v3 - d2 * roadThickness);
-			//	glVertexQVector3D(v4 - d2 * roadThickness);
-			//	glVertexQVector3D(v2 - d1 * roadThickness);
-			//	glVertexQVector3D(v1 - d1 * roadThickness);
-			//	glVertexQVector3D(v1 + d1 * roadThickness);
-			//	glVertexQVector3D(v2 + d1 * roadThickness);
-			//	glEnd();
-
-			//	glBegin(GL_QUADS); //單獨畫
-			//	glVertexQVector3D(v1 + d1 * roadThickness);
-			//	glVertexQVector3D(v1 - d1 * roadThickness);
-			//	glVertexQVector3D(v3 - d2 * roadThickness);
-			//	glVertexQVector3D(v3 + d2 * roadThickness);
-
-			//	glVertexQVector3D(v2 + d1 * roadThickness);
-			//	glVertexQVector3D(v2 - d1 * roadThickness);
-			//	glVertexQVector3D(v4 - d2 * roadThickness);
-			//	glVertexQVector3D(v4 + d2 * roadThickness);
-			//	glEnd();
-			//}
 		}
-	}
-	else if (curve == 2) // Cubic
-	{
-		for (size_t i = 0; i < m_pTrack->points.size(); ++i)
+		else if (track == 1) //兩條線的軌道
 		{
+			glLineWidth(3);
+			glColor3ub(32, 32, 64);
+			glBegin(GL_LINE_STRIP);
+			for (auto p : trackLeft)
+				glVertexQVector3D(p);
+			glVertexQVector3D(trackLeft.front());
 
+			glEnd();
+			glBegin(GL_LINE_STRIP);
+			for (auto p : trackRight)
+				glVertexQVector3D(p);
+			glVertexQVector3D(trackRight.front());
+			glEnd();
+		}
+		else if (track == 2) //鋪設軌道平面
+		{
+			for (size_t i = 0; i < trackMiddle.size(); i++)
+			{
+				const float roadThickness = 0.35;
+
+
+				/*     馬路的後面
+					s4 ________  s3
+					  /        /|
+					 /        / |          |
+				 s1	/_______ /s2|          ↓ dd
+					|        |  / s7
+					|  s8    | /
+					|_______ |/
+				 s5          s6
+					馬路的前面
+				*/
+				QVector3D s1 = trackLeft.at(i);
+				QVector3D s2 = trackRight.at(i);
+				QVector3D s3 = trackRight.at((i + 1) % trackRight.size());
+				QVector3D s4 = trackLeft.at((i + 1) % trackLeft.size());
+				QVector3D dd = QVector3D::crossProduct(s1 - s2, s3 - s2).normalized(); //往下的方向
+				QVector3D s5 = s1 + dd * roadThickness;
+				QVector3D s6 = s2 + dd * roadThickness;
+				QVector3D s7 = s3 + dd * roadThickness;
+				QVector3D s8 = s4 + dd * roadThickness;
+
+				glColor4f(0.05, 0.1, 0.3, 0.2);
+
+				glBegin(GL_QUAD_STRIP); //連續畫
+				glVertexQVector3D(s1);
+				glVertexQVector3D(s2);
+				glVertexQVector3D(s4);
+				glVertexQVector3D(s3);
+				glVertexQVector3D(s8);
+				glVertexQVector3D(s7);
+				glVertexQVector3D(s5);
+				glVertexQVector3D(s6);
+				glVertexQVector3D(s1);
+				glVertexQVector3D(s2);
+				glEnd();
+
+				glBegin(GL_QUADS); //單獨畫
+				glVertexQVector3D(s2);
+				glVertexQVector3D(s3);
+				glVertexQVector3D(s7);
+				glVertexQVector3D(s6);
+
+				glVertexQVector3D(s1);
+				glVertexQVector3D(s4);
+				glVertexQVector3D(s8);
+				glVertexQVector3D(s5);
+				glEnd();
+
+			}
 		}
 	}
+
 
 	// 鋪設木棧道
 	{
