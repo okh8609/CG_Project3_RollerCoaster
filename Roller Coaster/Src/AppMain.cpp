@@ -304,7 +304,7 @@ void AppMain::ChangeSpeedOfTrain( int val )
 	//m_rollerCoaster->trainSpeed = m_rollerCoaster->MAX_TRAIN_SPEED * float(val) / 100.0f;
 }
 
-void AppMain::AddControlPoint()
+void AppMain::AddControlPoint() //!!
 {
 	// get the number of points
 	size_t npts = this->m_Track.points.size();
@@ -326,7 +326,7 @@ void AppMain::AddControlPoint()
 	this->damageMe();
 }
 
-void AppMain::DeleteControlPoint()
+void AppMain::DeleteControlPoint()  //!!
 {
 	if (this->m_Track.points.size() > 4) {
 		if (this->trainview->selectedCube >= 0) {

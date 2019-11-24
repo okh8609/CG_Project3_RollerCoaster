@@ -82,7 +82,15 @@ public:
 
 	Model *m;
 	MyObjLoader model;
+
+
 private:
 	inline void glVertexQVector3D(QVector3D v);
+
+	float arcLength; //軌道總長度
+
+	float t_time;
+	unsigned int DIVIDE_LINE;
+
 };  
 #endif // TRAINVIEW_H  

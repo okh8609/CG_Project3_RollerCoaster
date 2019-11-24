@@ -184,7 +184,6 @@ void TrainView::paintGL()
 	m->render(false, false);
 
 
-
 	//畫四角椎當火車頭   	 
 	drawTrain();
 }
@@ -195,8 +194,7 @@ void TrainView::paintGL()
 //   HOWEVER: it doesn't clear the projection first (the caller handles
 //   that) - its important for picking
 //========================================================================
-void TrainView::
-setProjection()
+void TrainView::setProjection()
 //========================================================================
 {
 	// Compute the aspect ratio (we'll need it)
@@ -206,11 +204,15 @@ setProjection()
 
 	// Check whether we use the world camp
 	if (this->camera == 0) {
+		//上帝視角
+
 		arcball.setProjection(false);
 		update();
 		// Or we use the top cam
 	}
 	else if (this->camera == 1) {
+		//普通視角
+
 		float wi, he;
 		if (aspect >= 1) {
 			//wi = 110;
@@ -236,6 +238,13 @@ setProjection()
 	// TODO: 
 	// put code for train view projection here!	
 	else if (this->camera == 2) {
+		//火車視角 (未完成!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)
+		//火車視角 (未完成!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)
+		//火車視角 (未完成!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)
+		//火車視角 (未完成!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)
+		//火車視角 (未完成!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)
+
+
 		float eyeX = 15, eyeY = 15, eyeZ = 15;
 
 		glMatrixMode(GL_PROJECTION);
@@ -254,13 +263,14 @@ setProjection()
 		update();
 	}
 	//####################################################################
-	else {
+	else
+	{
 #ifdef EXAMPLE_SOLUTION
 		trainCamView(this, aspect);
 #endif
 		update();
 	}
-	}
+}
 
 //************************************************************************
 //
@@ -276,6 +286,8 @@ setProjection()
 //========================================================================
 void TrainView::drawStuff(bool doingShadows)
 {
+	// 畫軌道
+
 
 	// Draw the control points
 	// don't draw the control points if you're driving 
@@ -297,64 +309,6 @@ void TrainView::drawStuff(bool doingShadows)
 	// TODO: 
 	// call your own track drawing code
 	//####################################################################
-/*
-	//float t_time;
-	unsigned int DIVIDE_LINE = 2; //有幾條線
-
-
-	for (size_t i = 0; i < m_pTrack->points.size(); ++i)
-	{
-		// 位置
-		Point3f cp_pos_p1 = m_pTrack->points[i].pos;
-		Point3f cp_pos_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].pos;
-		// 方向
-		Point3f cp_orient_p1 = m_pTrack->points[i].orient;
-		Point3f cp_orient_p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].orient;
-
-		Point3f qt, qt0, qt1, orient_t;
-
-		float percent = 1.0f / DIVIDE_LINE;
-		float t = 0;
-
-		switch (curve)
-		{
-		case 0: // "Linear"
-			qt = (1 - t) * cp_pos_p1 + t * cp_pos_p2;
-			break;
-		}
-
-		for (size_t j = 0; j < DIVIDE_LINE; j++) {
-			qt0 = qt;
-
-			switch (curve) {
-			case  0: // "Linear"
-				orient_t = (1 - t) * cp_orient_p1 + t * cp_orient_p2;
-				break;
-			}
-
-			t += percent;
-
-			switch (curve) {
-			case 0: // "Linear"
-				qt = (1 - t) * cp_pos_p1 + t * cp_pos_p2;
-				break;
-			}
-			qt1 = qt;
-		}
-
-		glLineWidth(3);
-		glBegin(GL_LINES);
-		if (!doingShadows) {
-			glColor3ub(32, 32, 64);
-		}
-		glVertex3f(qt0.x, qt0.y, qt0.z);
-		glVertex3f(qt1.x, qt1.y, qt1.z);
-
-		glEnd();
-		glLineWidth(1);
-
-	}
-*/
 
 
 #ifdef EXAMPLE_SOLUTION
@@ -380,11 +334,16 @@ void TrainView::drawStuff(bool doingShadows)
 	//	KaiHao's Code
 	//####################################################################
 
-	vector<Point3f> trackMiddle; //鐵軌的中間軌道點
-	vector<Point3f> trackLeft; //雙軌的左邊軌道點
-	vector<Point3f> trackRight; //雙軌的右邊軌道點
+	//vector<Point3f> trackMiddle; //鐵軌的中間軌道點
+	//vector<Point3f> trackLeft; //雙軌的左邊軌道點
+	//vector<Point3f> trackRight; //雙軌的右邊軌道點
 
-	if (curve == 0) // "Linear"
+	this->arcLength = 0; //總長度先設為0
+
+
+	//畫軌道線
+	//曲線型態  0:"Linear"、1:"Cardinal"、2:"Cubic"
+	if (curve == 0) //軌道是線性的
 	{
 		for (size_t i = 0; i < m_pTrack->points.size(); ++i)
 		{
@@ -394,6 +353,7 @@ void TrainView::drawStuff(bool doingShadows)
 			QVector3D p1(_p1.x, _p1.y, _p1.z);
 			QVector3D p2(_p2.x, _p2.y, _p2.z);
 			QVector3D p1_p2(p2 - p1); //p1指向p2的向量
+			this->arcLength += p1_p2.length(); //加長度進去
 			p1_p2.normalize();
 
 			// 控制點指向的方向
@@ -409,8 +369,8 @@ void TrainView::drawStuff(bool doingShadows)
 			QVector3D v3 = p2 + QVector3D::crossProduct(p1_p2, d2) * trackWidth;
 			QVector3D v4 = p2 - QVector3D::crossProduct(p1_p2, d2) * trackWidth;
 
-
-			if (track == 0)
+			//軌道型態  0:"Line"  1:"Track"  2:"Road"
+			if (track == 0) //單一條線的軌道
 			{
 				glLineWidth(3);
 				glColor3ub(32, 32, 64);
@@ -419,7 +379,7 @@ void TrainView::drawStuff(bool doingShadows)
 				glVertexQVector3D(p2);
 				glEnd();
 			}
-			else if (track == 1)
+			else if (track == 1) //兩條線的軌道
 			{
 				glLineWidth(3);
 				glColor3ub(32, 32, 64);
@@ -430,7 +390,7 @@ void TrainView::drawStuff(bool doingShadows)
 				glVertexQVector3D(v4);
 				glEnd();
 			}
-			else if (track == 2)
+			else if (track == 2) //鋪設軌道平面
 			{
 				const float roadThickness = 0.35;
 
@@ -463,12 +423,235 @@ void TrainView::drawStuff(bool doingShadows)
 			}
 		}
 	}
+	else if (curve == 1) // Cardinal
+	{
+		const int NumIntegralDiv = 100; //Number of Integral Divide - 線段積分 總共切幾份
+		float tens = 0.5; //tension 矩陣的參數 0~1
+		QMatrix4x4 M(-1, 2, -1, 0,
+			2 / tens - 1, 1 - 3 / tens, 0, 1 / tens,
+			1 - 2 / tens, 3 / tens - 2, 1, 0,
+			1, -1, 0, 0);
+
+
+		for (size_t i = 0; i < m_pTrack->points.size(); ++i)
+		{
+			// 控制點的位置
+			Point3f _p0 = m_pTrack->points[(i - 1) % m_pTrack->points.size()].pos;
+			Point3f _p1 = m_pTrack->points[i].pos; //
+			Point3f _p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].pos; //
+			Point3f _p3 = m_pTrack->points[(i + 2) % m_pTrack->points.size()].pos;
+			QMatrix4x4 G(QMatrix4x4(_p0.x, _p0.y, _p0.z, 0,
+				_p1.x, _p1.y, _p1.z, 0,
+				_p2.x, _p2.y, _p2.z, 0,
+				_p3.x, _p3.y, _p3.z, 0).transposed());
+			QMatrix4x4 GxM = G * M;
+
+			// 控制點指向的方向
+			Point3f _d1 = m_pTrack->points[i].orient;
+			Point3f _d2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].orient;
+			QVector3D d1(_d1.x, _d1.y, _d1.z); d1.normalize();
+			QVector3D d2(_d2.x, _d2.y, _d2.z); d2.normalize();
+
+			//取各線段
+
+			glLineWidth(3);
+			glColor3ub(32, 32, 64);
+			glBegin(GL_LINE_STRIP);
+			for (size_t i = 0; i <= NumIntegralDiv; ++i)
+			{
+				float t = (float)i / (float)NumIntegralDiv; //整體進度 t = 0 ~ 1
+
+				QVector4D T(t*t*t, t*t, t, 1);
+
+				QVector4D _q = G * M * T;
+				QVector3D Q(_q.x(), _q.y(), _q.z());
+
+				glVertexQVector3D(Q);
+			}
+			glEnd();
+
+
+
+			////算左右延伸的兩點
+			//const int trackWidth = 3;
+			//QVector3D v1 = p1 + QVector3D::crossProduct(p1_p2, d1) * trackWidth;
+			//QVector3D v2 = p1 - QVector3D::crossProduct(p1_p2, d1) * trackWidth;
+			//QVector3D v3 = p2 + QVector3D::crossProduct(p1_p2, d2) * trackWidth;
+			//QVector3D v4 = p2 - QVector3D::crossProduct(p1_p2, d2) * trackWidth;
+
+			////軌道型態  0:"Line"  1:"Track"  2:"Road"
+			//if (track == 0) //單一條線的軌道
+			//{
+			//	glLineWidth(3);
+			//	glColor3ub(32, 32, 64);
+			//	glBegin(GL_LINES);
+			//	glVertexQVector3D(p1);
+			//	glVertexQVector3D(p2);
+			//	glEnd();
+			//}
+			//else if (track == 1) //兩條線的軌道
+			//{
+			//	glLineWidth(3);
+			//	glColor3ub(32, 32, 64);
+			//	glBegin(GL_LINES);
+			//	glVertexQVector3D(v1);
+			//	glVertexQVector3D(v3);
+			//	glVertexQVector3D(v2);
+			//	glVertexQVector3D(v4);
+			//	glEnd();
+			//}
+			//else if (track == 2) //鋪設軌道平面
+			//{
+			//	const float roadThickness = 0.35;
+
+			//	glColor4f(0.05, 0.1, 0.3, 0.2);
+
+			//	glBegin(GL_QUADS); //連續畫
+			//	glVertexQVector3D(v1 + d1 * roadThickness);
+			//	glVertexQVector3D(v2 + d1 * roadThickness);
+			//	glVertexQVector3D(v4 + d2 * roadThickness);
+			//	glVertexQVector3D(v3 + d2 * roadThickness);
+			//	glVertexQVector3D(v3 - d2 * roadThickness);
+			//	glVertexQVector3D(v4 - d2 * roadThickness);
+			//	glVertexQVector3D(v2 - d1 * roadThickness);
+			//	glVertexQVector3D(v1 - d1 * roadThickness);
+			//	glVertexQVector3D(v1 + d1 * roadThickness);
+			//	glVertexQVector3D(v2 + d1 * roadThickness);
+			//	glEnd();
+
+			//	glBegin(GL_QUADS); //單獨畫
+			//	glVertexQVector3D(v1 + d1 * roadThickness);
+			//	glVertexQVector3D(v1 - d1 * roadThickness);
+			//	glVertexQVector3D(v3 - d2 * roadThickness);
+			//	glVertexQVector3D(v3 + d2 * roadThickness);
+
+			//	glVertexQVector3D(v2 + d1 * roadThickness);
+			//	glVertexQVector3D(v2 - d1 * roadThickness);
+			//	glVertexQVector3D(v4 - d2 * roadThickness);
+			//	glVertexQVector3D(v4 + d2 * roadThickness);
+			//	glEnd();
+			//}
+		}
+	}
+	else if (curve == 2) // Cubic
+	{
+		for (size_t i = 0; i < m_pTrack->points.size(); ++i)
+		{
+
+		}
+	}
+
+	// 鋪設木棧道
+	{
+
+
+
+
+
+	}
+
+
+
+	/* 助教給的垃圾code
+
+	DIVIDE_LINE = 100;
+	t_time = 0.5;
+
+
+	for (size_t i = 0; i < m_pTrack->points.size(); ++i)
+	{
+
+		// 控制點的位置
+		Point3f _p1 = m_pTrack->points[i].pos;
+		Point3f _p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].pos;
+		QVector3D p1(_p1.x, _p1.y, _p1.z);
+		QVector3D p2(_p2.x, _p2.y, _p2.z);
+		QVector3D p1_p2(p2 - p1); //p1指向p2的向量
+		p1_p2.normalize();
+
+		// 控制點指向的方向
+		Point3f _d1 = m_pTrack->points[i].orient;
+		Point3f _d2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].orient;
+		QVector3D d1(_d1.x, _d1.y, _d1.z); d1.normalize();
+		QVector3D d2(_d2.x, _d2.y, _d2.z); d2.normalize();
+
+		// 一些咚咚
+		QVector3D qt, qt0, qt1, orient_t;
+
+		glLineWidth(4);
+		//glBegin(GL_LINES);
+		float percent = 1.0f / DIVIDE_LINE;
+		float t = 0;
+
+
+		if (curve == 0) //曲線型態  0:"Linear"、1:"Cardinal"、2:"Cubic"
+		{
+			qt = (1 - t) * p1 + t * p2;
+		}
+		else if (curve == 1)
+		{
+
+		}
+		else if (curve == 2)
+		{
+
+		}
+
+		for (size_t j = 0; j < DIVIDE_LINE; j++) {
+			qt0 = qt;
+			if (curve == 0) //曲線型態  0:"Linear"、1:"Cardinal"、2:"Cubic"
+			{
+				orient_t = (1 - t) * d1 + t * d2;
+			}
+			else if (curve == 1)
+			{
+
+			}
+			else if (curve == 2)
+			{
+
+			}
+			t += percent;
+			if (curve == 0) //曲線型態  0:"Linear"、1:"Cardinal"、2:"Cubic"
+			{
+				qt = (1 - t) * p1 + t * p2;
+			}
+			else if (curve == 1)
+			{
+
+
+			}
+			else if (curve == 2)
+			{
+
+			}
+			qt1 = qt;
+		}
+
+		glLineWidth(3);
+		glBegin(GL_LINES);
+		if (!doingShadows) {
+			glColor3ub(32, 32, 64);
+		}
+		glVertex3f(qt0.x(), qt0.y(), qt0.z());
+		glVertex3f(qt1.x(), qt1.y(), qt1.z());
+
+		glEnd();
+		glLineWidth(1);
+	}
+
+	*/
+
+
+
 
 }
 
 //void TrainView::drawTrain(QVector3D trainPos, QVector3D trainUp, QVector3D trainDir)
 void TrainView::drawTrain()
 {
+	//我自己定義的畫四角椎的function
+
 	//debug
 	QVector3D trainPos(0, 0, 0); //火車的位置
 	QVector3D trainUp(0, 1, 0);  //火車上方
@@ -506,8 +689,7 @@ void TrainView::drawTrain()
 	glEnd();
 }
 
-void TrainView::
-doPick(int mx, int my)
+void TrainView::doPick(int mx, int my)
 //========================================================================
 {
 	// since we'll need to do some GL stuff so we make this window as 
