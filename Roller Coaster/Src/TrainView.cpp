@@ -565,6 +565,11 @@ void TrainView::drawStuff(bool doingShadows)
 		}
 		else if (track == 2) //鋪設軌道平面
 		{
+			vector<QVector3D> roadUp;
+			vector<QVector3D> roadDn;
+			vector<QVector3D> roadLf;
+			vector<QVector3D> roadRi;
+
 			for (size_t i = 0; i < trackMiddle.size(); i++)
 			{
 				const float roadThickness = 0.35;
@@ -581,6 +586,7 @@ void TrainView::drawStuff(bool doingShadows)
 					馬路的前面
 				*/
 
+
 				QVector3D s1 = trackLeft.at(i);
 				QVector3D s2 = trackRight.at(i);
 				QVector3D s3 = trackRight.at((i + 1) % trackRight.size());
@@ -591,34 +597,48 @@ void TrainView::drawStuff(bool doingShadows)
 				QVector3D s7 = s3 + dd * roadThickness;
 				QVector3D s8 = s4 + dd * roadThickness;
 
-				glColor4f(0.05, 0.1, 0.3, 0.2);
+				roadUp.push_back(s1);
+				roadUp.push_back(s2);
 
-				glBegin(GL_QUAD_STRIP); //連續畫
-				glVertexQVector3D(s1);
-				glVertexQVector3D(s2);
-				glVertexQVector3D(s4);
-				glVertexQVector3D(s3);
-				glVertexQVector3D(s8);
-				glVertexQVector3D(s7);
-				glVertexQVector3D(s5);
-				glVertexQVector3D(s6);
-				glVertexQVector3D(s1);
-				glVertexQVector3D(s2);
-				glEnd();
+				roadDn.push_back(s5);
+				roadDn.push_back(s6);
 
-				glBegin(GL_QUADS); //單獨畫
-				glVertexQVector3D(s2);
-				glVertexQVector3D(s3);
-				glVertexQVector3D(s7);
-				glVertexQVector3D(s6);
+				roadLf.push_back(s1);
+				roadLf.push_back(s5);
 
-				glVertexQVector3D(s1);
-				glVertexQVector3D(s4);
-				glVertexQVector3D(s8);
-				glVertexQVector3D(s5);
-				glEnd();
-
+				roadRi.push_back(s2);
+				roadRi.push_back(s6);
 			}
+
+			glColor4f(0.05, 0.1, 0.3, 0.2);
+
+			glBegin(GL_QUAD_STRIP); //連續畫
+			for (auto s : roadUp)
+				glVertexQVector3D(s);
+			glVertexQVector3D(roadUp.at(0));
+			glVertexQVector3D(roadUp.at(1));
+			glEnd();
+
+			glBegin(GL_QUAD_STRIP); //連續畫
+			for (auto s : roadDn)
+				glVertexQVector3D(s);
+			glVertexQVector3D(roadDn.at(0));
+			glVertexQVector3D(roadDn.at(1));
+			glEnd();
+
+			glBegin(GL_QUAD_STRIP); //連續畫
+			for (auto s : roadLf)
+				glVertexQVector3D(s);
+			glVertexQVector3D(roadLf.at(0));
+			glVertexQVector3D(roadLf.at(1));
+			glEnd();
+
+			glBegin(GL_QUAD_STRIP); //連續畫
+			for (auto s : roadRi)
+				glVertexQVector3D(s);
+			glVertexQVector3D(roadRi.at(0));
+			glVertexQVector3D(roadRi.at(1));
+			glEnd();
 		}
 	}
 
