@@ -425,12 +425,13 @@ void TrainView::drawStuff(bool doingShadows)
 	}
 	else if (curve == 1) // Cardinal
 	{
-		const int NumIntegralDiv = 100; //Number of Integral Divide - 線段積分 總共切幾份
-		float tens = 0.5; //tension 矩陣的參數 0~1
+		const int NumIntegralDiv = 25; //Number of Integral Divide - 線段積分 總共切幾份
+		float tens = 0.5; // 矩陣的參數 tension = 0.01~1 (軌道彎曲程度)
 		QMatrix4x4 M(-1, 2, -1, 0,
 			2 / tens - 1, 1 - 3 / tens, 0, 1 / tens,
 			1 - 2 / tens, 3 / tens - 2, 1, 0,
 			1, -1, 0, 0);
+		M *= tens;
 
 
 		for (size_t i = 0; i < m_pTrack->points.size(); ++i)
@@ -440,10 +441,10 @@ void TrainView::drawStuff(bool doingShadows)
 			Point3f _p1 = m_pTrack->points[i].pos; //
 			Point3f _p2 = m_pTrack->points[(i + 1) % m_pTrack->points.size()].pos; //
 			Point3f _p3 = m_pTrack->points[(i + 2) % m_pTrack->points.size()].pos;
-			QMatrix4x4 G(QMatrix4x4(_p0.x, _p0.y, _p0.z, 0,
-				_p1.x, _p1.y, _p1.z, 0,
-				_p2.x, _p2.y, _p2.z, 0,
-				_p3.x, _p3.y, _p3.z, 0).transposed());
+			QMatrix4x4 G(_p0.x, _p1.x, _p2.x, _p3.x,
+				_p0.y, _p1.y, _p2.y, _p3.y,
+				_p0.z, _p1.z, _p2.z, _p3.z,
+				0, 0, 0, 0);
 			QMatrix4x4 GxM = G * M;
 
 			// 控制點指向的方向
@@ -452,11 +453,11 @@ void TrainView::drawStuff(bool doingShadows)
 			QVector3D d1(_d1.x, _d1.y, _d1.z); d1.normalize();
 			QVector3D d2(_d2.x, _d2.y, _d2.z); d2.normalize();
 
-			//取各線段
-
+			//繪製各線段
 			glLineWidth(3);
 			glColor3ub(32, 32, 64);
 			glBegin(GL_LINE_STRIP);
+			QVector3D preQ(_p1.x, _p1.y, _p1.z); //
 			for (size_t i = 0; i <= NumIntegralDiv; ++i)
 			{
 				float t = (float)i / (float)NumIntegralDiv; //整體進度 t = 0 ~ 1
@@ -465,8 +466,10 @@ void TrainView::drawStuff(bool doingShadows)
 
 				QVector4D _q = G * M * T;
 				QVector3D Q(_q.x(), _q.y(), _q.z());
-
 				glVertexQVector3D(Q);
+
+				arcLength += (Q - preQ).length(); //
+				preQ = Q; //
 			}
 			glEnd();
 
