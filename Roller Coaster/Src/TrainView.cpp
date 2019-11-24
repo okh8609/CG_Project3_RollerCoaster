@@ -499,7 +499,7 @@ void TrainView::drawStuff(bool doingShadows)
 			for (size_t i = 1; i < subTrackMiddle.size(); ++i)
 			{
 				// 角度 沒特別講，就用線性的吧
-				QVector3D dd = d1 + (d2 - d1) * i / subTrackMiddle.size();
+				QVector3D dd = d1 + (d2 - d1) * i / (subTrackMiddle.size() - 1);
 				dd.normalize();
 
 				const QVector3D& pa = subTrackMiddle.at(i - 1);
@@ -523,7 +523,7 @@ void TrainView::drawStuff(bool doingShadows)
 			for (size_t i = 1; i < subTrackMiddle.size(); ++i)
 			{
 				//角度沒特別講，就用線性的吧
-				QVector3D dd = d1 + (d2 - d1) * i / subTrackMiddle.size();
+				QVector3D dd = d1 + (d2 - d1) * i / (subTrackMiddle.size() - 1);
 				dd.normalize();
 
 				const QVector3D& pa = subTrackMiddle.at(i - 1);
@@ -569,7 +569,6 @@ void TrainView::drawStuff(bool doingShadows)
 			{
 				const float roadThickness = 0.35;
 
-
 				/*     馬路的後面
 					s4 ________  s3
 					  /        /|
@@ -581,6 +580,7 @@ void TrainView::drawStuff(bool doingShadows)
 				 s5          s6
 					馬路的前面
 				*/
+
 				QVector3D s1 = trackLeft.at(i);
 				QVector3D s2 = trackRight.at(i);
 				QVector3D s3 = trackRight.at((i + 1) % trackRight.size());
