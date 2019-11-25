@@ -21,6 +21,7 @@ AppMain::AppMain(QWidget *parent)
 	this->trainview->track = 0;
 	this->trainview->curve = 0;
 	this->trainview->isrun = false;
+	this->trainview->lastRedraw = 0;
 
 	setWindowTitle( "Roller Coaster" );
 
@@ -277,7 +278,6 @@ void AppMain::ChangeTrackType( QString type )
 	}
 }
 
-static unsigned long lastRedraw = 0;
 void AppMain::SwitchPlayAndPause()
 {
 	if( !this->trainview->isrun )
@@ -291,10 +291,11 @@ void AppMain::SwitchPlayAndPause()
 		this->trainview->isrun = !this->trainview->isrun;
 	}
 	if(this->trainview->isrun){
-		if (clock() - lastRedraw > CLOCKS_PER_SEC/30) {
-			lastRedraw = clock();
+		if (clock() - this->trainview->lastRedraw > CLOCKS_PER_SEC/30) {
+			this->trainview->lastRedraw = clock();
 			this->advanceTrain();
 			this->damageMe();
+			cout << "###" << endl;
 		}
 	}
 }
@@ -302,6 +303,8 @@ void AppMain::SwitchPlayAndPause()
 void AppMain::ChangeSpeedOfTrain( int val )
 {
 	//m_rollerCoaster->trainSpeed = m_rollerCoaster->MAX_TRAIN_SPEED * float(val) / 100.0f;
+	this->trainview->trainSpeed = float(val) / 100.0f;
+	cout << this->trainview->trainSpeed << endl;
 }
 
 void AppMain::AddControlPoint() //!!

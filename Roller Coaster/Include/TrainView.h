@@ -74,6 +74,8 @@ public:
 	int curve; //曲線型態  0:"Linear"、1:"Cardinal"、2:"Cubic" 
 	int track; //軌道型態  0:"Line"  1:"Track"  2:"Road"  
 	bool isrun;
+	unsigned long lastRedraw;
+	float trainSpeed; //0~1 用來評估火車的速度
 	Triangle* triangle;
 	Square* square;
 	GLfloat ProjectionMatrex[16];
@@ -83,20 +85,21 @@ public:
 	Model *m;
 	MyObjLoader model;
 
+	QVector3D trainPos; //火車的位置
+	QVector3D trainUp;  //火車上方
+	QVector3D trainDire;  //火車的前方
+
 
 private:
 	inline void glVertexQVector3D(const QVector3D& v);
 	inline void glNormalQVector3D(const QVector3D& v);
 
-
 	void drawBox(QVector3D pos, float size);
-
-
 
 	float arcLength; //軌道總長度
 
+
 	float t_time;
 	unsigned int DIVIDE_LINE;
-
 };  
 #endif // TRAINVIEW_H  

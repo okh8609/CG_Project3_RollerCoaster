@@ -13,6 +13,11 @@ TrainView::TrainView(QWidget *parent) :
 
 	string path("C:/Users/KaiHao/Desktop/實驗室/3D身體調變/3D model obj file/obj_2/20190624_064424_262Y1Q6D.obj");
 	this->model = MyObjLoader(path, 50, QVector3D(0, 35, 0));
+
+
+	trainPos = QVector3D(0, 4, 6); //火車的位置
+	trainUp = QVector3D(0, 1, 0);  //火車上方
+	trainDire = QVector3D(1, 0, 1);  //火車的前方
 }
 TrainView::~TrainView()
 {}
@@ -210,10 +215,20 @@ void TrainView::paintGL()
 	model.render();
 
 	//畫四角椎當火車頭 
-	QVector3D trainPos(0, 4, 6); //火車的位置
-	QVector3D trainUp(0, 1, 0);  //火車上方
-	QVector3D trainDire(1, 0, 1);  //火車的前方
+	if (this->isrun)
+	{
+		if (clock() - lastRedraw > CLOCKS_PER_SEC / 30)
+		{
+			lastRedraw = clock();
+			cout << lastRedraw << endl;
+
+			trainPos += QVector3D(0.1, 0, 0);
+		}
+	}
+	cout << trainPos.x() << ',' << trainPos.y() << ',' << trainPos.z() << endl;
 	drawTrain(trainPos, trainUp, trainDire);
+
+
 
 	// this time drawing is for shadows (except for top view)
 	if (this->camera != 1) {
@@ -334,7 +349,7 @@ void TrainView::setProjection()
 		trainCamView(this, aspect);
 #endif
 		update();
-	}
+}
 }
 
 //************************************************************************
