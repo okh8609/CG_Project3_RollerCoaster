@@ -7,7 +7,7 @@ TrainView::TrainView(QWidget *parent) :
 
 	resetArcball();
 
-	this->m = new Model("C:/Users/KaiHao/Desktop/Computer Graphics/DGMM-Lab/P3/arrow.obj", 100, Point3d(0, 0, 0));
+	this->m = new Model("C:/Users/KaiHao/Desktop/Computer Graphics/DGMM-Lab/P3/arrow.obj", 50, Point3d(0, 0, 0));
 	//m = new Model("C:/Users/KaiHao/Desktop/實驗室/3D身體調變/3D model obj file/obj_2/20190624_064424_262Y1Q6D.obj", 100, Point3d(0, 0, 0));
 
 
@@ -38,9 +38,14 @@ void TrainView::initializeTexture()
 	Textures.push_back(texture);
 }
 
-inline void TrainView::glVertexQVector3D(QVector3D v)
+inline void TrainView::glVertexQVector3D(const QVector3D& v)
 {
 	glVertex3f(v.x(), v.y(), v.z());
+}
+
+inline void TrainView::glNormalQVector3D(const QVector3D& v)
+{
+	glNormal3d(v.x(), v.y(), v.z());
 }
 
 void TrainView::drawBox(QVector3D pos, float size)
@@ -204,6 +209,12 @@ void TrainView::paintGL()
 	glColor4f(0, 0.2, 0.5, 1);
 	model.render();
 
+	//畫四角椎當火車頭 
+	QVector3D trainPos(0, 4, 6); //火車的位置
+	QVector3D trainUp(0, 1, 0);  //火車上方
+	QVector3D trainDire(1, 0, 1);  //火車的前方
+	drawTrain(trainPos, trainUp, trainDire);
+
 	// this time drawing is for shadows (except for top view)
 	if (this->camera != 1) {
 		setupShadows();
@@ -240,8 +251,6 @@ void TrainView::paintGL()
 	m->render(false, false);
 
 
-	//畫四角椎當火車頭   	 
-	drawTrain();
 }
 
 //************************************************************************
@@ -596,7 +605,8 @@ void TrainView::drawStuff(bool doingShadows)
 		if (track == 0) //單一條線的軌道
 		{
 			glLineWidth(3);
-			glColor3ub(32, 32, 64);
+			//glColor3ub(32, 32, 64);
+			glColor4f(0.05, 0.1, 0.3, 0);
 			glBegin(GL_LINE_STRIP);
 			for (auto p : trackMiddle)
 				glVertexQVector3D(p);
@@ -606,7 +616,8 @@ void TrainView::drawStuff(bool doingShadows)
 		else if (track == 1) //兩條線的軌道
 		{
 			glLineWidth(3);
-			glColor3ub(32, 32, 64);
+			//glColor3ub(32, 32, 64);
+			glColor4f(0.05, 0.1, 0.3, 0);
 			glBegin(GL_LINE_STRIP);
 			for (auto p : trackLeft)
 				glVertexQVector3D(p);
@@ -647,7 +658,7 @@ void TrainView::drawStuff(bool doingShadows)
 				QVector3D s2 = trackRight.at(i);
 				QVector3D s3 = trackRight.at((i + 1) % trackRight.size());
 				QVector3D s4 = trackLeft.at((i + 1) % trackLeft.size());
-				QVector3D dd = QVector3D::crossProduct(s1 - s2, s3 - s2).normalized(); //往下的方向
+				QVector3D dd = QVector3D::crossProduct(s3 - s2, s1 - s2).normalized(); //往上的方向
 				QVector3D s5 = s1 + dd * roadThickness;
 				QVector3D s6 = s2 + dd * roadThickness;
 				QVector3D s7 = s3 + dd * roadThickness;
@@ -666,7 +677,7 @@ void TrainView::drawStuff(bool doingShadows)
 				roadRi.push_back(s6);
 			}
 
-			glColor4f(0.05, 0.1, 0.3, 0.2);
+			glColor4f(0.05, 0.1, 0.3, 0);
 
 			glBegin(GL_QUAD_STRIP); //連續畫
 			for (auto s : roadUp)
@@ -702,7 +713,7 @@ void TrainView::drawStuff(bool doingShadows)
 	// 鋪設木棧道
 	if (curve == 1 || curve == 2)
 	{
-		const float eachSpacing = 10.0; // 每片木頭間，相隔多少長度
+		const float eachSpacing = 8.0; // 每片木頭間，相隔多少長度
 		float currSpacing = eachSpacing; //距離鋪下一面木頭，還有多少距離
 
 		QVector3D curr = trackMiddle.at(0); //目前走到的位置
@@ -720,8 +731,74 @@ void TrainView::drawStuff(bool doingShadows)
 			}
 			else //走下一步，不會跨過去
 			{
+
+
 				curr += (*next - curr).normalized()*currSpacing;
-				drawBox(curr, 2);
+
+				{
+					//drawBox(curr, 2);
+
+					//--------------------------------------------
+
+					const int woodWidth = 5;
+					const int woodHight = 2;
+					const float woodThickness = 0.4;
+					const float downTrack = 0.05;
+
+					/*     木棧道的前面
+						s4 ________  s3
+						  /        /|
+						 /        / |		   ↓ uu : 下方
+					 s1	/_______ /s2|          ← ll : 左方
+						|        |  / s7       / ff : 前方
+						|  s8    | /
+						|_______ |/
+					 s5          s6
+					   木棧道的前面
+					*/
+
+					int index = (next - trackMiddle.begin()) - 1;
+					QVector3D ll = (trackRight.at(index) - trackLeft.at(index)).normalized();
+					QVector3D ff = (*next - curr).normalized();
+					QVector3D uu = QVector3D::crossProduct(ff, ll).normalized();
+
+					QVector3D s5 = curr + ll * woodWidth + uu * downTrack;
+					QVector3D s6 = curr - ll * woodWidth + uu * downTrack;
+					QVector3D s7 = curr + ll * woodWidth + ff * woodHight + uu * downTrack;
+					QVector3D s8 = curr - ll * woodWidth + ff * woodHight + uu * downTrack;
+					QVector3D s1 = curr + ll * woodWidth + uu * woodThickness;
+					QVector3D s2 = curr - ll * woodWidth + uu * woodThickness;
+					QVector3D s3 = curr + ll * woodWidth + ff * woodHight + uu * woodThickness;
+					QVector3D s4 = curr - ll * woodWidth + ff * woodHight + uu * woodThickness;
+
+					glColor4f(0.8, 0.8, 0.8, 0);
+
+					glBegin(GL_QUAD_STRIP); //連續畫
+					glVertexQVector3D(s1);
+					glVertexQVector3D(s2);
+					glVertexQVector3D(s3);
+					glVertexQVector3D(s4);
+					glVertexQVector3D(s8);
+					glVertexQVector3D(s7);
+					glVertexQVector3D(s6);
+					glVertexQVector3D(s5);
+					glVertexQVector3D(s1);
+					glVertexQVector3D(s2);
+					glEnd();
+
+					glBegin(GL_QUADS); //單獨畫
+					glVertexQVector3D(s1);
+					glVertexQVector3D(s4);
+					glVertexQVector3D(s8);
+					glVertexQVector3D(s5);
+
+					glVertexQVector3D(s2);
+					glVertexQVector3D(s3);
+					glVertexQVector3D(s7);
+					glVertexQVector3D(s6);
+					glEnd();
+				}
+
 				currSpacing = eachSpacing;
 			}
 		}
@@ -824,46 +901,100 @@ void TrainView::drawStuff(bool doingShadows)
 
 }
 
-//void TrainView::drawTrain(QVector3D trainPos, QVector3D trainUp, QVector3D trainDir)
-void TrainView::drawTrain()
+void TrainView::drawTrain(QVector3D trainPos, QVector3D trainUp, QVector3D trainDire)
+//void TrainView::drawTrain()
 {
 	//我自己定義的畫四角椎的function
 
-	//debug
-	QVector3D trainPos(0, 0, 0); //火車的位置
-	QVector3D trainUp(0, 1, 0);  //火車上方
-	QVector3D trainDire(1, 0, 0);  //火車的前方
-	QVector3D trainLeft(QVector3D::crossProduct(trainUp, trainDire).normalized());  //火車的左方
-	////////
+	//debug////
+	//QVector3D trainPos(0, 4, 6); //火車的位置
+	//QVector3D trainUp(0, 1, 0);  //火車上方
+	//QVector3D trainDire(1, 0, 1);  //火車的前方
+	///////////
+	QVector3D trainLeft(QVector3D::crossProduct(trainUp, trainDire));  //火車的左方
 
-	const float trainSize = 5;
+	const float trainHeight = 4;
+	const float trainBack = 4;
+	const float trainFront = 6;
+	const float trainWidth = 5.0 / 2;
 
 	trainUp.normalize();
 	trainDire.normalize();
 	trainLeft.normalize();
 
-	trainPos += trainUp * trainSize;
+	/*     木棧道的前面
+		s4 ________  s3
+		  /        /|
+		 /        / |		   ↓ uu : 下方
+	 s1	/_______ /s2|          ← ll : 左方
+		/       /   / s7       / ff : 前方
+	   / s8    /  /
+	  /	______/ /
+	 s5          s6
+	   木棧道的前面
+	*/
 
+	QVector3D s1 = trainPos + trainUp * trainHeight - trainLeft * trainWidth;
+	QVector3D s2 = trainPos + trainUp * trainHeight + trainLeft * trainWidth;
+	QVector3D s3 = trainPos + trainUp * trainHeight + trainLeft * trainWidth - trainDire * trainBack;
+	QVector3D s4 = trainPos + trainUp * trainHeight - trainLeft * trainWidth - trainDire * trainBack;
+	QVector3D s5 = trainPos - trainLeft * trainWidth + trainDire * trainFront;
+	QVector3D s6 = trainPos + trainLeft * trainWidth + trainDire * trainFront;
+	QVector3D s7 = trainPos + trainLeft * trainWidth - trainDire * trainBack;
+	QVector3D s8 = trainPos - trainLeft * trainWidth - trainDire * trainBack;
 
-	//畫四角錐作為車頭
-	glColor3f(1, 1, 1);
+	//s1 s2 s3 s4
+	//s8 s7 s6 s5
+	//s3 s2 s6 s7
+	//s1 s4 s8 s5
+	//s2 s1 s5 s6
+	//s4 s3 s7 s8
 
-	glBegin(GL_TRIANGLE_FAN);
-	glVertexQVector3D(trainPos + trainDire * trainSize * 2);
-	glVertexQVector3D(trainPos + trainUp * trainSize + trainLeft * trainSize);
-	glVertexQVector3D(trainPos + trainUp * trainSize - trainLeft * trainSize);
-	glVertexQVector3D(trainPos - trainUp * trainSize - trainLeft * trainSize);
-	glVertexQVector3D(trainPos - trainUp * trainSize + trainLeft * trainSize);
-	glVertexQVector3D(trainPos + trainUp * trainSize + trainLeft * trainSize);
+	glColor4f(232.0 / 255.0, 117.0 / 255.0, 17.0 / 255.0, 0.5);
+
+	glBegin(GL_POLYGON);
+	glNormalQVector3D(QVector3D::normal(s2 - s1, s3 - s1));
+	glVertexQVector3D(s1); //a
+	glVertexQVector3D(s2); //b
+	glVertexQVector3D(s3); //c
+	glVertexQVector3D(s4);
 	glEnd();
-	glBegin(GL_TRIANGLE_FAN);
-	glVertexQVector3D(trainPos);
-	glVertexQVector3D(trainPos + trainUp * trainSize + trainLeft * trainSize);
-	glVertexQVector3D(trainPos + trainUp * trainSize - trainLeft * trainSize);
-	glVertexQVector3D(trainPos - trainUp * trainSize - trainLeft * trainSize);
-	glVertexQVector3D(trainPos - trainUp * trainSize + trainLeft * trainSize);
-	glVertexQVector3D(trainPos + trainUp * trainSize + trainLeft * trainSize);
+	glBegin(GL_POLYGON);
+	glNormalQVector3D(QVector3D::normal(s7 - s8, s6 - s8));
+	glVertexQVector3D(s8); //a
+	glVertexQVector3D(s7); //b
+	glVertexQVector3D(s6); //c
+	glVertexQVector3D(s5);
 	glEnd();
+	glBegin(GL_POLYGON);
+	glNormalQVector3D(QVector3D::normal(s2 - s3, s6 - s3));
+	glVertexQVector3D(s3); //a
+	glVertexQVector3D(s2); //b
+	glVertexQVector3D(s6); //c
+	glVertexQVector3D(s7);
+	glEnd();
+	glBegin(GL_POLYGON);
+	glNormalQVector3D(QVector3D::normal(s4 - s1, s8 - s1));
+	glVertexQVector3D(s1); //a
+	glVertexQVector3D(s4); //b
+	glVertexQVector3D(s8); //c
+	glVertexQVector3D(s5);
+	glEnd();
+	glBegin(GL_POLYGON);
+	glNormalQVector3D(QVector3D::normal(s1 - s2, s5 - s2));
+	glVertexQVector3D(s2); //a
+	glVertexQVector3D(s1); //b
+	glVertexQVector3D(s5); //c
+	glVertexQVector3D(s6);
+	glEnd();
+	glBegin(GL_POLYGON);
+	glNormalQVector3D(QVector3D::normal(s3 - s4, s7 - s4));
+	glVertexQVector3D(s4); //a
+	glVertexQVector3D(s3); //b
+	glVertexQVector3D(s7); //c
+	glVertexQVector3D(s8);
+	glEnd();
+
 }
 
 void TrainView::doPick(int mx, int my)

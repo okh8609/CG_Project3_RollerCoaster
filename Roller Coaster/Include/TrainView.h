@@ -47,8 +47,8 @@ public:
 	void drawStuff(bool doingShadows=false);
 
 	// µe¤õ¨®
-	//void drawTrain(QVector3D trainPos, QVector3D trainUp, QVector3D trainDir);
-	void drawTrain();
+	void drawTrain(QVector3D trainPos, QVector3D trainUp, QVector3D trainDir);
+	//void drawTrain();
 
 	// setup the projection - assuming that the projection stack has been
 	// cleared for you
@@ -85,7 +85,8 @@ public:
 
 
 private:
-	inline void glVertexQVector3D(QVector3D v);
+	inline void glVertexQVector3D(const QVector3D& v);
+	inline void glNormalQVector3D(const QVector3D& v);
 
 
 	void drawBox(QVector3D pos, float size);
