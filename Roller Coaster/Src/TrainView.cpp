@@ -43,6 +43,62 @@ inline void TrainView::glVertexQVector3D(QVector3D v)
 	glVertex3f(v.x(), v.y(), v.z());
 }
 
+void TrainView::drawBox(QVector3D pos, float size)
+{
+	glColor3f(0.8, 0.1, 0.1);
+
+	size /= 2;
+
+	//上
+	glBegin(GL_QUADS);
+	glNormal3d(0, 1, 0);
+	glVertex3f(pos.x() + size, pos.y() + size, pos.z() + size);
+	glVertex3f(pos.x() + size, pos.y() + size, pos.z() - size);
+	glVertex3f(pos.x() - size, pos.y() + size, pos.z() - size);
+	glVertex3f(pos.x() - size, pos.y() + size, pos.z() + size);
+	glEnd();
+	//下
+	glBegin(GL_QUADS);
+	glNormal3d(0, -1, 0);
+	glVertex3f(pos.x() + size, pos.y() - size, pos.z() + size);
+	glVertex3f(pos.x() + size, pos.y() - size, pos.z() - size);
+	glVertex3f(pos.x() - size, pos.y() - size, pos.z() - size);
+	glVertex3f(pos.x() - size, pos.y() - size, pos.z() + size);
+	glEnd();
+	//右
+	glBegin(GL_QUADS);
+	glNormal3d(1, 0, 0);
+	glVertex3f(pos.x() + size, pos.y() + size, pos.z() + size);
+	glVertex3f(pos.x() + size, pos.y() + size, pos.z() - size);
+	glVertex3f(pos.x() + size, pos.y() - size, pos.z() - size);
+	glVertex3f(pos.x() + size, pos.y() - size, pos.z() + size);
+	glEnd();
+	//左
+	glBegin(GL_QUADS);
+	glNormal3d(-1, 0, 0);
+	glVertex3f(pos.x() - size, pos.y() + size, pos.z() + size);
+	glVertex3f(pos.x() - size, pos.y() + size, pos.z() - size);
+	glVertex3f(pos.x() - size, pos.y() - size, pos.z() - size);
+	glVertex3f(pos.x() - size, pos.y() - size, pos.z() + size);
+	glEnd();
+	//前
+	glBegin(GL_QUADS);
+	glNormal3d(0, 0, 1);
+	glVertex3f(pos.x() + size, pos.y() + size, pos.z() + size);
+	glVertex3f(pos.x() + size, pos.y() - size, pos.z() + size);
+	glVertex3f(pos.x() - size, pos.y() - size, pos.z() + size);
+	glVertex3f(pos.x() - size, pos.y() + size, pos.z() + size);
+	glEnd();
+	//後
+	glBegin(GL_QUADS);
+	glNormal3d(0, 0, -1);
+	glVertex3f(pos.x() + size, pos.y() + size, pos.z() - size);
+	glVertex3f(pos.x() + size, pos.y() - size, pos.z() - size);
+	glVertex3f(pos.x() - size, pos.y() - size, pos.z() - size);
+	glVertex3f(pos.x() - size, pos.y() + size, pos.z() - size);
+	glEnd();
+}
+
 void TrainView::resetArcball()
 //========================================================================
 {
@@ -565,10 +621,10 @@ void TrainView::drawStuff(bool doingShadows)
 		}
 		else if (track == 2) //鋪設軌道平面
 		{
-			vector<QVector3D> roadUp;
-			vector<QVector3D> roadDn;
-			vector<QVector3D> roadLf;
-			vector<QVector3D> roadRi;
+			vector<QVector3D> roadUp; //路面上方 要連續畫的點
+			vector<QVector3D> roadDn; //路面下方 要連續畫的點
+			vector<QVector3D> roadLf; //路面左方 要連續畫的點
+			vector<QVector3D> roadRi; //路面右方 要連續畫的點
 
 			for (size_t i = 0; i < trackMiddle.size(); i++)
 			{
@@ -644,12 +700,31 @@ void TrainView::drawStuff(bool doingShadows)
 
 
 	// 鋪設木棧道
+	if (curve == 1 || curve == 2)
 	{
+		const float eachSpacing = 10.0; // 每片木頭間，相隔多少長度
+		float currSpacing = eachSpacing; //距離鋪下一面木頭，還有多少距離
 
+		QVector3D curr = trackMiddle.at(0); //目前走到的位置
+		vector<QVector3D>::iterator next = ++trackMiddle.begin(); //下一個將會走到的點
 
+		while (next != trackMiddle.end())
+		{
+			float distance = (*next - curr).length(); //目前的點 走到縣段終點的距離
 
-
-
+			if (currSpacing - distance > 0) //走下一步，會跨過去
+			{
+				currSpacing -= distance;
+				curr = *next;
+				++next;
+			}
+			else //走下一步，不會跨過去
+			{
+				curr += (*next - curr).normalized()*currSpacing;
+				drawBox(curr, 2);
+				currSpacing = eachSpacing;
+			}
+		}
 	}
 
 

@@ -87,6 +87,11 @@ public:
 private:
 	inline void glVertexQVector3D(QVector3D v);
 
+
+	void drawBox(QVector3D pos, float size);
+
+
+
 	float arcLength; //軌道總長度
 
 	float t_time;
