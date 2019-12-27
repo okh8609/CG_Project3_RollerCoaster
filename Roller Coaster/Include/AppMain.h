@@ -37,6 +37,7 @@ public:
 	void advanceTrain(float dir = 1);
 
 
+
 public:
 	// keep track of the stuff in the world
 	CTrack				m_Track;
@@ -86,6 +87,9 @@ private:
 		void RotateControlPointSubX();
 		void RotateControlPointAddZ();
 		void RotateControlPointSubZ();
+
+		void pushButtonClick();
+
 
 protected:
 	bool eventFilter(QObject *watched, QEvent *e); 

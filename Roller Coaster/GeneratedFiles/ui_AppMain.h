@@ -13,7 +13,9 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
+#include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
@@ -21,6 +23,7 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QRadioButton>
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStatusBar>
@@ -72,6 +75,14 @@ public:
     QSpacerItem *horizontalSpacer_4;
     QSlider *sSpeed;
     QSpacerItem *horizontalSpacer_3;
+    QGridLayout *gridLayout;
+    QVBoxLayout *verticalLayout_2;
+    QRadioButton *radioButton_1;
+    QRadioButton *radioButton_2;
+    QRadioButton *radioButton_3;
+    QPushButton *pushButton;
+    QCheckBox *checkBox;
+    QCheckBox *checkBox_2;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuCamera;
@@ -544,10 +555,52 @@ public:
 
         verticalLayout->addLayout(horizontalLayout_2);
 
+        gridLayout = new QGridLayout();
+        gridLayout->setSpacing(6);
+        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        verticalLayout_2 = new QVBoxLayout();
+        verticalLayout_2->setSpacing(6);
+        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
+        radioButton_1 = new QRadioButton(centralWidget);
+        radioButton_1->setObjectName(QStringLiteral("radioButton_1"));
+
+        verticalLayout_2->addWidget(radioButton_1);
+
+        radioButton_2 = new QRadioButton(centralWidget);
+        radioButton_2->setObjectName(QStringLiteral("radioButton_2"));
+
+        verticalLayout_2->addWidget(radioButton_2);
+
+        radioButton_3 = new QRadioButton(centralWidget);
+        radioButton_3->setObjectName(QStringLiteral("radioButton_3"));
+
+        verticalLayout_2->addWidget(radioButton_3);
+
+
+        gridLayout->addLayout(verticalLayout_2, 0, 2, 1, 1);
+
+        pushButton = new QPushButton(centralWidget);
+        pushButton->setObjectName(QStringLiteral("pushButton"));
+
+        gridLayout->addWidget(pushButton, 0, 3, 1, 1);
+
+        checkBox = new QCheckBox(centralWidget);
+        checkBox->setObjectName(QStringLiteral("checkBox"));
+
+        gridLayout->addWidget(checkBox, 0, 4, 1, 1);
+
+        checkBox_2 = new QCheckBox(centralWidget);
+        checkBox_2->setObjectName(QStringLiteral("checkBox_2"));
+
+        gridLayout->addWidget(checkBox_2, 1, 4, 1, 1);
+
+
+        verticalLayout->addLayout(gridLayout);
+
         AppMainClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(AppMainClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 1028, 21));
+        menuBar->setGeometry(QRect(0, 0, 1028, 25));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
         menuCamera = new QMenu(menuBar);
@@ -639,6 +692,12 @@ public:
         groupBox_2->setTitle(QApplication::translate("AppMainClass", "Rotate CP Z", Q_NULLPTR));
         rcpzadd->setText(QString());
         rcpzsub->setText(QString());
+        radioButton_1->setText(QApplication::translate("AppMainClass", "RadioButton", Q_NULLPTR));
+        radioButton_2->setText(QApplication::translate("AppMainClass", "RadioButton", Q_NULLPTR));
+        radioButton_3->setText(QApplication::translate("AppMainClass", "RadioButton", Q_NULLPTR));
+        pushButton->setText(QApplication::translate("AppMainClass", "PushButton", Q_NULLPTR));
+        checkBox->setText(QApplication::translate("AppMainClass", "CheckBox", Q_NULLPTR));
+        checkBox_2->setText(QApplication::translate("AppMainClass", "CheckBox", Q_NULLPTR));
         menuFile->setTitle(QApplication::translate("AppMainClass", "File", Q_NULLPTR));
         menuCamera->setTitle(QApplication::translate("AppMainClass", "Camera", Q_NULLPTR));
         menuCurve->setTitle(QApplication::translate("AppMainClass", "Curve", Q_NULLPTR));

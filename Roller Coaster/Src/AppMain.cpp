@@ -53,6 +53,10 @@ AppMain::AppMain(QWidget *parent)
 	connect( ui.rcpxsub		,SIGNAL(clicked()),this,SLOT(RotateControlPointSubX())				);
 	connect( ui.rcpzadd		,SIGNAL(clicked()),this,SLOT(RotateControlPointAddZ())					);
 	connect( ui.rcpzsub		,SIGNAL(clicked()),this,SLOT(RotateControlPointSubZ())				);
+
+
+	connect(ui.pushButton, SIGNAL(clicked()), this, SLOT(pushButtonClick()));
+
 }
 
 AppMain::~AppMain()
@@ -295,7 +299,7 @@ void AppMain::SwitchPlayAndPause()
 			this->trainview->lastRedraw = clock();
 			this->advanceTrain();
 			this->damageMe();
-			cout << "###" << endl;
+			//cout << "###" << endl;
 		}
 	}
 }
@@ -485,4 +489,13 @@ advanceTrain(float dir)
 	//#####################################################################
 	// TODO: make this work for your train
 	//#####################################################################
+}
+
+//=======================================================================
+// my GUI
+void AppMain::pushButtonClick()
+{
+	QMessageBox msgBox;
+	msgBox.setText("The document has been modified.");
+	msgBox.exec();
 }
