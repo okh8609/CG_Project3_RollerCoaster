@@ -999,7 +999,7 @@ QPushButton:pressed {
        <widget class="QSlider" name="sSpeed">
         <property name="minimumSize">
          <size>
-          <width>850</width>
+          <width>400</width>
           <height>0</height>
          </size>
         </property>
@@ -1014,6 +1014,56 @@ QPushButton:pressed {
 	width: 15px;
 	margin: -5px 0;
  }</string>
+        </property>
+        <property name="singleStep">
+         <number>1</number>
+        </property>
+        <property name="value">
+         <number>50</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_5">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QSlider" name="sCardinalTens">
+        <property name="minimumSize">
+         <size>
+          <width>400</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QSlider::groove:horizontal {
+	background-color: #505050;
+    height: 3px; 
+    margin: 2px 0;
+ }
+ QSlider::handle:horizontal {
+	image: url(:/AppMain/slider_handle.png);
+	width: 15px;
+	margin: -5px 0;
+ }</string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>100</number>
         </property>
         <property name="singleStep">
          <number>1</number>

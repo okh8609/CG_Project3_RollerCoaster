@@ -74,6 +74,8 @@ public:
     QHBoxLayout *horizontalLayout_2;
     QSpacerItem *horizontalSpacer_4;
     QSlider *sSpeed;
+    QSpacerItem *horizontalSpacer_5;
+    QSlider *sCardinalTens;
     QSpacerItem *horizontalSpacer_3;
     QGridLayout *gridLayout;
     QVBoxLayout *verticalLayout_2;
@@ -531,7 +533,7 @@ public:
 
         sSpeed = new QSlider(centralWidget);
         sSpeed->setObjectName(QStringLiteral("sSpeed"));
-        sSpeed->setMinimumSize(QSize(850, 0));
+        sSpeed->setMinimumSize(QSize(400, 0));
         sSpeed->setStyleSheet(QLatin1String("QSlider::groove:horizontal {\n"
 "	background-color: #505050;\n"
 "    height: 3px; \n"
@@ -547,6 +549,31 @@ public:
         sSpeed->setOrientation(Qt::Horizontal);
 
         horizontalLayout_2->addWidget(sSpeed);
+
+        horizontalSpacer_5 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_2->addItem(horizontalSpacer_5);
+
+        sCardinalTens = new QSlider(centralWidget);
+        sCardinalTens->setObjectName(QStringLiteral("sCardinalTens"));
+        sCardinalTens->setMinimumSize(QSize(400, 0));
+        sCardinalTens->setStyleSheet(QLatin1String("QSlider::groove:horizontal {\n"
+"	background-color: #505050;\n"
+"    height: 3px; \n"
+"    margin: 2px 0;\n"
+" }\n"
+" QSlider::handle:horizontal {\n"
+"	image: url(:/AppMain/slider_handle.png);\n"
+"	width: 15px;\n"
+"	margin: -5px 0;\n"
+" }"));
+        sCardinalTens->setMinimum(1);
+        sCardinalTens->setMaximum(100);
+        sCardinalTens->setSingleStep(1);
+        sCardinalTens->setValue(50);
+        sCardinalTens->setOrientation(Qt::Horizontal);
+
+        horizontalLayout_2->addWidget(sCardinalTens);
 
         horizontalSpacer_3 = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
 

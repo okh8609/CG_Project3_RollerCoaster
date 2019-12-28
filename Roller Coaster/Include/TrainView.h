@@ -69,13 +69,13 @@ public:
 	int				selectedCube;  // simple - just remember which cube is selected
 
 	CTrack*			m_pTrack;		// The track of the entire scene 軌道儲存
-
 	int camera; //相機視角
 	int curve; //曲線型態  0:"Linear"、1:"Cardinal"、2:"Cubic" 
 	int track; //軌道型態  0:"Line"  1:"Track"  2:"Road"  
 	bool isrun;
 	unsigned long lastRedraw;
 	float trainSpeed; //0~1 用來評估火車的速度
+	float tens = 0.5; // 矩陣的參數 tension = 0.01~1 (軌道彎曲程度)
 	Triangle* triangle;
 	Square* square;
 	GLfloat ProjectionMatrex[16];
@@ -101,5 +101,14 @@ private:
 
 	float t_time;
 	unsigned int DIVIDE_LINE;
+
+
+	const int NumIntegralDiv = 25; //Number of Integral Divide - 線段積分 總共切幾份
+	const int trackWidth = 2;
+	vector<QVector3D> trackMiddle; //鐵軌的中間軌道點
+	vector<QVector3D> trackLeft; //雙軌的左邊軌道點
+	vector<QVector3D> trackRight; //雙軌的右邊軌道點
+	UINT64 trainPositionIndex = 0;
+
 };  
 #endif // TRAINVIEW_H  

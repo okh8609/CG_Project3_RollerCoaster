@@ -22,6 +22,7 @@ AppMain::AppMain(QWidget *parent)
 	this->trainview->curve = 0;
 	this->trainview->isrun = false;
 	this->trainview->lastRedraw = 0;
+	this->trainview->trainSpeed = 0.5;
 
 	setWindowTitle( "Roller Coaster" );
 
@@ -46,6 +47,7 @@ AppMain::AppMain(QWidget *parent)
 
 	connect( ui.bPlay		,SIGNAL(clicked()),this,SLOT(SwitchPlayAndPause())				);
 	connect( ui.sSpeed		,SIGNAL(valueChanged(int)),this,SLOT(ChangeSpeedOfTrain(int))	);
+	connect( ui.sCardinalTens,SIGNAL(valueChanged(int)),this,SLOT(ChangeCardinalTens(int))	);
 	connect( ui.bAdd		,SIGNAL(clicked()),this,SLOT(AddControlPoint())					);
 	connect( ui.bDelete		,SIGNAL(clicked()),this,SLOT(DeleteControlPoint())				);
 
@@ -294,21 +296,26 @@ void AppMain::SwitchPlayAndPause()
 		ui.bPlay->setIcon(QIcon(":/AppMain/Resources/Icons/pause.ico"));
 		this->trainview->isrun = !this->trainview->isrun;
 	}
-	if(this->trainview->isrun){
-		if (clock() - this->trainview->lastRedraw > CLOCKS_PER_SEC/30) {
-			this->trainview->lastRedraw = clock();
-			this->advanceTrain();
-			this->damageMe();
-			//cout << "###" << endl;
-		}
-	}
+	//if(this->trainview->isrun){
+	//	if (clock() - this->trainview->lastRedraw > CLOCKS_PER_SEC/30) {
+	//		this->trainview->lastRedraw = clock();
+	//		this->advanceTrain();
+	//		this->damageMe();
+	//		//cout << "###" << endl;
+	//	}
+	//}
 }
 
 void AppMain::ChangeSpeedOfTrain( int val )
 {
+	//火車的速度
 	//m_rollerCoaster->trainSpeed = m_rollerCoaster->MAX_TRAIN_SPEED * float(val) / 100.0f;
 	this->trainview->trainSpeed = float(val) / 100.0f;
-	cout << this->trainview->trainSpeed << endl;
+}
+
+void AppMain::ChangeCardinalTens(int val)
+{
+	this->trainview->tens = float(val) / 100.0f;
 }
 
 void AppMain::AddControlPoint() //!!
