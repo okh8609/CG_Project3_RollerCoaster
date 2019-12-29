@@ -46,6 +46,9 @@ public:
 	// 畫軌道
 	void drawStuff(bool doingShadows = false);
 
+	// 畫支撐柱
+	void drawPillar();
+
 	// 畫火車
 	void drawTrain(QVector3D trainPos, QVector3D trainUp, QVector3D trainDir);
 	//void drawTrain();

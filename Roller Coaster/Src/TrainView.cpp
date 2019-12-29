@@ -220,7 +220,8 @@ void TrainView::paintGL()
 
 	trainDire = (nextPos - trainPos).normalized();
 	trainUp = QVector3D::crossProduct((trackRight.at(trainNextPositionIndex) - trackLeft.at(trainNextPositionIndex)), trainDire).normalized();
-	drawTrain(trainPos, trainUp, trainDire);
+	if (this->camera != 2)
+		drawTrain(trainPos, trainUp, trainDire);
 
 	cout << trainSpeed << endl;
 	//畫四角椎當火車頭 
@@ -235,7 +236,7 @@ void TrainView::paintGL()
 			{
 				trainCurrSpacing -= distance;
 				trainPos = nextPos;
-				trainNextPositionIndex+=2;
+				trainNextPositionIndex += 2;
 			}
 			else //走下一步，不會跨過去
 			{
@@ -335,26 +336,30 @@ void TrainView::setProjection()
 	// TODO: 
 	// put code for train view projection here!	
 	else if (this->camera == 2) {
-		//火車視角 (未完成!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)
-		//火車視角 (未完成!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)
-		//火車視角 (未完成!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)
-		//火車視角 (未完成!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)
-		//火車視角 (未完成!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)
-
-
-		float eyeX = 15, eyeY = 15, eyeZ = 15;
-
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		gluPerspective(60, aspect, .1, 1000);
+		gluPerspective(120, aspect, .1, 1000);
 
-		// Put the camera where we want it to be
+
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-		glTranslatef(-eyeX, -eyeY, -eyeZ);
-		//glRotatef(-45, 1, 0, 0);
-		glRotatef(-45, 0, 1, 0); //向左看45度
+		auto trainCent = trainPos + trainDire * 3 + trainUp * 2;
+		auto trainPos2 = trainPos + trainDire * 2 + trainUp * 2;
+
+		gluLookAt(trainPos2.x(), trainPos2.y(), trainPos2.z(),
+			trainCent.x(), trainCent.y(), trainCent.z(),
+			trainUp.x(), trainUp.y(), trainUp.z());
+
+		//float eyeX = 15, eyeY = 15, eyeZ = 15;
+
+
+		//// Put the camera where we want it to be
+		//glMatrixMode(GL_MODELVIEW);
+		//glLoadIdentity();
+		//glTranslatef(-eyeX, -eyeY, -eyeZ);
+		////glRotatef(-45, 1, 0, 0);
 		//glRotatef(-45, 0, 1, 0); //向左看45度
+		////glRotatef(-45, 0, 1, 0); //向左看45度
 
 
 		update();
@@ -399,6 +404,11 @@ void TrainView::drawStuff(bool doingShadows)
 		}
 		update();
 	}
+	//畫支撐柱
+	glColor3ub(77, 28, 17);
+	drawPillar();
+
+
 
 	//####################################################################
 	// TODO: 
@@ -704,6 +714,33 @@ void TrainView::drawStuff(bool doingShadows)
 		}
 	}
 #pragma endregion
+}
+
+void TrainView::drawPillar()
+{
+	QVector2D cy[19] = { QVector2D(1.000, 0.000),QVector2D(0.940, 0.342),QVector2D(0.766, 0.643),QVector2D(0.500, 0.866),
+		QVector2D(0.174, 0.985),QVector2D(-0.173, 0.985),QVector2D(-0.499, 0.867),QVector2D(-0.765, 0.644),QVector2D(-0.939, 0.343),
+		QVector2D(-1.000, 0.002),QVector2D(-0.940, -0.340),QVector2D(-0.767, -0.641),QVector2D(-0.502, -0.865),QVector2D(-0.176, -0.984),
+		QVector2D(0.171, -0.985),QVector2D(0.498, -0.867),QVector2D(0.764, -0.645),QVector2D(0.939, -0.345),QVector2D(1.000, -0.003) };
+
+
+	const int r = 2;
+	for (size_t i = 0; i < 19; ++i)
+		cy[i] *= r;
+
+
+	for (ControlPoint cp : m_pTrack->points)
+	{
+		Point3f pos = cp.pos;
+
+		glBegin(GL_QUAD_STRIP); //連續畫
+		for (size_t i = 0; i < 19; ++i)
+		{
+			glVertex3f(pos.x + cy[i].x(), pos.y, pos.z + cy[i].y());
+			glVertex3f(pos.x + cy[i].x(), 0.0f, pos.z + cy[i].y());
+		}
+		glEnd();
+	}
 }
 
 void TrainView::drawTrain(QVector3D trainPos, QVector3D trainUp, QVector3D trainDire)

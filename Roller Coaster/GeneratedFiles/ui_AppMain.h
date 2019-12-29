@@ -71,9 +71,6 @@ public:
     QGroupBox *groupBox_2;
     QPushButton *rcpzadd;
     QPushButton *rcpzsub;
-    QGroupBox *groupBox_4;
-    QPushButton *trainPosForward;
-    QPushButton *trainPosBackward;
     QSpacerItem *horizontalSpacer_2;
     QHBoxLayout *horizontalLayout_2;
     QSpacerItem *horizontalSpacer_4;
@@ -523,48 +520,6 @@ public:
 
         horizontalLayout->addWidget(groupBox_2);
 
-        groupBox_4 = new QGroupBox(centralWidget);
-        groupBox_4->setObjectName(QStringLiteral("groupBox_4"));
-        groupBox_4->setMinimumSize(QSize(120, 150));
-        groupBox_4->setMaximumSize(QSize(200, 150));
-        groupBox_4->setFont(font1);
-        groupBox_4->setStyleSheet(QLatin1String("background-color: rgb(249, 249, 249);\n"
-"border-radius: 5px;"));
-        trainPosForward = new QPushButton(groupBox_4);
-        trainPosForward->setObjectName(QStringLiteral("trainPosForward"));
-        trainPosForward->setGeometry(QRect(10, 40, 100, 44));
-        sizePolicy2.setHeightForWidth(trainPosForward->sizePolicy().hasHeightForWidth());
-        trainPosForward->setSizePolicy(sizePolicy2);
-        trainPosForward->setStyleSheet(QLatin1String("QPushButton {\n"
-"	background-color: rgb(80, 80, 80);\n"
-"	color: rgb(240, 240, 240);\n"
-"    border-radius: 10px;\n"
-"}\n"
-"\n"
-"QPushButton:pressed {\n"
-"	background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(172, 172, 172, 255), stop:1 rgba(0, 0, 0, 203));\n"
-"     padding-top: 10px;\n"
-"     padding-left: 5px;\n"
-"}"));
-        trainPosForward->setIcon(icon3);
-        trainPosBackward = new QPushButton(groupBox_4);
-        trainPosBackward->setObjectName(QStringLiteral("trainPosBackward"));
-        trainPosBackward->setGeometry(QRect(10, 90, 100, 44));
-        trainPosBackward->setStyleSheet(QLatin1String("QPushButton {\n"
-"	background-color: rgb(80, 80, 80);\n"
-"	color: rgb(240, 240, 240);\n"
-"    border-radius: 10px;\n"
-"}\n"
-"\n"
-"QPushButton:pressed {\n"
-"	background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(172, 172, 172, 255), stop:1 rgba(0, 0, 0, 203));\n"
-"     padding-top: 10px;\n"
-"     padding-left: 5px;\n"
-"}"));
-        trainPosBackward->setIcon(icon4);
-
-        horizontalLayout->addWidget(groupBox_4);
-
         horizontalSpacer_2 = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout->addItem(horizontalSpacer_2);
@@ -780,9 +735,6 @@ public:
         groupBox_2->setTitle(QApplication::translate("AppMainClass", "Rotate CP Z", Q_NULLPTR));
         rcpzadd->setText(QString());
         rcpzsub->setText(QString());
-        groupBox_4->setTitle(QApplication::translate("AppMainClass", "Train Pos", Q_NULLPTR));
-        trainPosForward->setText(QString());
-        trainPosBackward->setText(QString());
         label->setText(QApplication::translate("AppMainClass", "Speed", Q_NULLPTR));
         label_2->setText(QApplication::translate("AppMainClass", "CardinalTens", Q_NULLPTR));
         radioButton_1->setText(QApplication::translate("AppMainClass", "RadioButton", Q_NULLPTR));
