@@ -5,6 +5,7 @@
 #include <QWidget>
 #include <QFileDialog>
 #include <QMediaPlayer>
+#include <QMediaPlaylist>
 #include "ui_AppMain.h"
 #include <qgl.h>
 #include "TrainView.h"  
@@ -58,6 +59,8 @@ private:
 	void rollx( float dir );
 	void rollz( float dir );
 	Ui::AppMainClass ui;
+
+	QMediaPlaylist *playlist;
 	QMediaPlayer * player;
 
 

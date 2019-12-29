@@ -343,8 +343,8 @@ void TrainView::setProjection()
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-		auto trainCent = trainPos + trainDire * 3 + trainUp * 2;
-		auto trainPos2 = trainPos + trainDire * 2 + trainUp * 2;
+		auto trainCent = trainPos + trainDire + trainUp * 3;
+		auto trainPos2 = trainPos + trainUp * 3;
 
 		gluLookAt(trainPos2.x(), trainPos2.y(), trainPos2.z(),
 			trainCent.x(), trainCent.y(), trainCent.z(),

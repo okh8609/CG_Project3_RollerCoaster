@@ -27,15 +27,15 @@ AppMain::AppMain(QWidget *parent)
 	//this->trainview->trainCurrSpacing = ui.sSpeed->maximum();
 
 	//­I´º­µ¼Ö
-	ofstream ofs("ccccc.txt");
-	ofs << "ccc" << endl;
+	this->playlist = new QMediaPlaylist();
+	playlist->addMedia(QUrl::fromLocalFile("LazyRiverRag.mp3"));
+	//playlist->addMedia(QUrl::fromLocalFile("button.mp3"));
+	playlist->setPlaybackMode(QMediaPlaylist::Loop); 
 
-	this->player = new QMediaPlayer;
-	//connect(this->player, SIGNAL(positionChanged(qint64)), this, SLOT(positionChanged(qint64)));
-	this->player->setMedia(QUrl::fromLocalFile("LazyRiverRag.mp3"));
+	this->player = new QMediaPlayer();
+	this->player->setPlaylist(playlist);
 	this->player->setVolume(50);
 	this->player->play();
-
 
 	setWindowTitle("Roller Coaster");
 

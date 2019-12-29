@@ -1,42 +1,52 @@
-#pragma once
+ï»¿#pragma once
 
 #include <QtOpenGL>  
 #include <GL/GLU.h>
 #pragma comment(lib,"opengl32.lib")
 #pragma comment(lib,"glu32.lib") 
-//#include "Utilities/ArcBallCam.H"
-//#include "Utilities/3DUtils.H"
 
 
 typedef struct tag_PARTICLE
 {
-	GLfloat xpos;//(xpos,ypos,zpos)¬°particleªºposition
+	GLfloat xpos;//(xpos,ypos,zpos)ç‚ºparticleçš„position
 	GLfloat ypos;
 	GLfloat zpos;
-	GLfloat xspeed;//(xspeed,yspeed,zspeed)¬°particleªºspeed 
+	GLfloat xspeed;//(xspeed,yspeed,zspeed)ç‚ºparticleçš„speed 
 	GLfloat yspeed;
 	GLfloat zspeed;
-	GLfloat r;//(r,g,b)¬°particleªºcolor
+	GLfloat r;//(r,g,b)ç‚ºparticleçš„color
 	GLfloat g;
 	GLfloat b;
-	GLfloat life;// particleªº¹Ø©R 
-	GLfloat fade;// particleªº°I´î³t«×
-	GLfloat size;// particleªº¤j¤p  
-	GLbyte    bFire;
-	GLbyte    nExpl;//­şºØparticle®ÄªG  
-	GLbyte    bAddParts;// particle¬O§_§t¦³§À¤Ú
-	GLfloat   AddSpeed;//§À¤Ú²É¤lªº¥[³t«×  
-	GLfloat   AddCount;//§À¤Ú²É¤lªº¼W¥[¶q  
-	tag_PARTICLE* pNext;//¤U¤@particle 
-	tag_PARTICLE* pPrev;//¤W¤@particle   
-} Particle, *pParticle;
-
+	GLfloat life;// particleçš„å£½å‘½ 
+	GLfloat fade;// particleçš„è¡°æ¸›é€Ÿåº¦
+	GLfloat size;// particleçš„å¤§å°  
+	GLbyte bFire;
+	GLbyte nExpl;//å“ªç¨®particleæ•ˆæœ  
+	GLbyte bAddParts;// particleæ˜¯å¦å«æœ‰å°¾å·´
+	GLfloat AddSpeed;//å°¾å·´ç²’å­çš„åŠ é€Ÿåº¦  
+	GLfloat AddCount;//å°¾å·´ç²’å­çš„å¢åŠ é‡  
+	tag_PARTICLE* pNext;//ä¸‹ä¸€particle 
+	tag_PARTICLE* pPrev;//ä¸Šä¸€particle   
+} Particle;
 
 
 void InitParticle(Particle& ep);
 void AddParticle(Particle ex);
-void ProcessParticles();
+void DeleteParticle(Particle** p);
+
 void Explosion1(Particle* par);
+void Explosion2(Particle* par);
+void Explosion3(Particle* par);
+void Explosion4(Particle* par);
+void Explosion5(Particle* par);
+void Explosion6(Particle * par);
+void Explosion7(Particle * par);
+
+void ProcessParticles();
 void DrawParticles();
-void DeleteParticle(pParticle* p);
-void DeleteAll(pParticle* Part);
+
+
+class Particle2
+{
+public:
+};
