@@ -15,7 +15,7 @@ TrainView::TrainView(QWidget *parent) :
 	this->model = MyObjLoader(path, 50, QVector3D(0, 35, 0));
 
 
-	trainPos = QVector3D(0, 4, 6); //火車的位置
+	trainPos = QVector3D(50, 5, 0); //火車的位置
 	trainUp = QVector3D(0, 1, 0);  //火車上方
 	trainDire = QVector3D(1, 0, 1);  //火車的前方
 }
@@ -215,25 +215,35 @@ void TrainView::paintGL()
 	model.render();
 
 #pragma region 火車跑跑跑
-	//*********************************************************************
-	// 畫火車 與
-	// 讓火車會跑
-	//*********************************************************************
+	trainNextPositionIndex %= trackMiddle.size();
+	QVector3D nextPos = trackMiddle.at(trainNextPositionIndex);
 
+	trainDire = (nextPos - trainPos).normalized();
+	trainUp = QVector3D::crossProduct((trackRight.at(trainNextPositionIndex) - trackLeft.at(trainNextPositionIndex)), trainDire).normalized();
+	drawTrain(trainPos, trainUp, trainDire);
+
+	cout << trainSpeed << endl;
 	//畫四角椎當火車頭 
 	if (this->isrun)
 	{
-		if (clock() - lastRedraw > CLOCKS_PER_SEC / 30)
+		if ((clock() - lastRedraw)*trainSpeed > CLOCKS_PER_SEC / 120)
 		{
 			lastRedraw = clock();
-			cout << lastRedraw << endl;
-			cout << this->trainSpeed << endl;
 
-			trainPos += QVector3D(0.5 * this->trainSpeed, 0, 0); //移動的速度 在這裡動手腳
+			float distance = (nextPos - trainPos).length(); //目前的點 走到下一個點的距離
+			if (trainCurrSpacing - distance > 0) //走下一步，會跨過去
+			{
+				trainCurrSpacing -= distance;
+				trainPos = nextPos;
+				trainNextPositionIndex+=2;
+			}
+			else //走下一步，不會跨過去
+			{
+				trainPos += (nextPos - trainPos).normalized()*trainCurrSpacing;
+				trainCurrSpacing = 1;
+			}
 		}
 	}
-	//cout << trainPos.x() << ',' << trainPos.y() << ',' << trainPos.z() << endl;
-	drawTrain(trainPos, trainUp, trainDire);
 #pragma endregion
 
 

@@ -4,10 +4,12 @@
 #include <QMainWindow>
 #include <QWidget>
 #include <QFileDialog>
+#include <QMediaPlayer>
 #include "ui_AppMain.h"
 #include <qgl.h>
 #include "TrainView.h"  
 #include "Track.H"
+#include <fstream>
 
 class CTrack;
 
@@ -56,6 +58,8 @@ private:
 	void rollx( float dir );
 	void rollz( float dir );
 	Ui::AppMainClass ui;
+	QMediaPlayer * player;
+
 
 	private slots:
 		void LoadTrackPath();
@@ -80,8 +84,6 @@ private:
 		void SwitchPlayAndPause();
 		void ChangeSpeedOfTrain( int val );
 		void ChangeCardinalTens(int val);
-
-		
 
 		void AddControlPoint();
 		void DeleteControlPoint();

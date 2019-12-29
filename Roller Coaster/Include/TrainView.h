@@ -29,11 +29,11 @@ class CTrack;
 
 
 class TrainView : public QGLWidget, protected QOpenGLFunctions_4_3_Core
-{  
-	Q_OBJECT  
-public:  
-	explicit TrainView(QWidget *parent = 0);  
-	~TrainView();  
+{
+	Q_OBJECT
+public:
+	explicit TrainView(QWidget *parent = 0);
+	~TrainView();
 
 public:
 	// overrides of important window things
@@ -44,7 +44,7 @@ public:
 	// it has to be encapsulated, since we draw differently if
 	// we're drawing shadows (no colors, for example)
 	// 畫軌道
-	void drawStuff(bool doingShadows=false);
+	void drawStuff(bool doingShadows = false);
 
 	// 畫火車
 	void drawTrain(QVector3D trainPos, QVector3D trainUp, QVector3D trainDir);
@@ -74,7 +74,7 @@ public:
 	int track; //軌道型態  0:"Line"  1:"Track"  2:"Road"  
 	bool isrun;
 	unsigned long lastRedraw;
-	float trainSpeed; //0~1 用來評估火車的速度
+	float trainSpeed; //0~99 用來評估火車的速度
 	float tens = 0.5; // 矩陣的參數 tension = 0.01~1 (軌道彎曲程度)
 	Triangle* triangle;
 	Square* square;
@@ -90,7 +90,7 @@ public:
 	QVector3D trainDire;  //火車的前方
 
 
-private:
+//private:
 	inline void glVertexQVector3D(const QVector3D& v);
 	inline void glNormalQVector3D(const QVector3D& v);
 
@@ -108,7 +108,8 @@ private:
 	vector<QVector3D> trackMiddle; //鐵軌的中間軌道點
 	vector<QVector3D> trackLeft; //雙軌的左邊軌道點
 	vector<QVector3D> trackRight; //雙軌的右邊軌道點
-	UINT64 trainPositionIndex = 0;
+	UINT64 trainNextPositionIndex = 1;
+	float trainCurrSpacing=1; //距離下一步，還有多少距離
 
-};  
+};
 #endif // TRAINVIEW_H  

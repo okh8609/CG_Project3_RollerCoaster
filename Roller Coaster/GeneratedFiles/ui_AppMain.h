@@ -19,6 +19,7 @@
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
@@ -70,11 +71,16 @@ public:
     QGroupBox *groupBox_2;
     QPushButton *rcpzadd;
     QPushButton *rcpzsub;
+    QGroupBox *groupBox_4;
+    QPushButton *trainPosForward;
+    QPushButton *trainPosBackward;
     QSpacerItem *horizontalSpacer_2;
     QHBoxLayout *horizontalLayout_2;
     QSpacerItem *horizontalSpacer_4;
+    QLabel *label;
     QSlider *sSpeed;
     QSpacerItem *horizontalSpacer_5;
+    QLabel *label_2;
     QSlider *sCardinalTens;
     QSpacerItem *horizontalSpacer_3;
     QGridLayout *gridLayout;
@@ -517,6 +523,48 @@ public:
 
         horizontalLayout->addWidget(groupBox_2);
 
+        groupBox_4 = new QGroupBox(centralWidget);
+        groupBox_4->setObjectName(QStringLiteral("groupBox_4"));
+        groupBox_4->setMinimumSize(QSize(120, 150));
+        groupBox_4->setMaximumSize(QSize(200, 150));
+        groupBox_4->setFont(font1);
+        groupBox_4->setStyleSheet(QLatin1String("background-color: rgb(249, 249, 249);\n"
+"border-radius: 5px;"));
+        trainPosForward = new QPushButton(groupBox_4);
+        trainPosForward->setObjectName(QStringLiteral("trainPosForward"));
+        trainPosForward->setGeometry(QRect(10, 40, 100, 44));
+        sizePolicy2.setHeightForWidth(trainPosForward->sizePolicy().hasHeightForWidth());
+        trainPosForward->setSizePolicy(sizePolicy2);
+        trainPosForward->setStyleSheet(QLatin1String("QPushButton {\n"
+"	background-color: rgb(80, 80, 80);\n"
+"	color: rgb(240, 240, 240);\n"
+"    border-radius: 10px;\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(172, 172, 172, 255), stop:1 rgba(0, 0, 0, 203));\n"
+"     padding-top: 10px;\n"
+"     padding-left: 5px;\n"
+"}"));
+        trainPosForward->setIcon(icon3);
+        trainPosBackward = new QPushButton(groupBox_4);
+        trainPosBackward->setObjectName(QStringLiteral("trainPosBackward"));
+        trainPosBackward->setGeometry(QRect(10, 90, 100, 44));
+        trainPosBackward->setStyleSheet(QLatin1String("QPushButton {\n"
+"	background-color: rgb(80, 80, 80);\n"
+"	color: rgb(240, 240, 240);\n"
+"    border-radius: 10px;\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(172, 172, 172, 255), stop:1 rgba(0, 0, 0, 203));\n"
+"     padding-top: 10px;\n"
+"     padding-left: 5px;\n"
+"}"));
+        trainPosBackward->setIcon(icon4);
+
+        horizontalLayout->addWidget(groupBox_4);
+
         horizontalSpacer_2 = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout->addItem(horizontalSpacer_2);
@@ -531,9 +579,15 @@ public:
 
         horizontalLayout_2->addItem(horizontalSpacer_4);
 
+        label = new QLabel(centralWidget);
+        label->setObjectName(QStringLiteral("label"));
+        label->setFont(font1);
+
+        horizontalLayout_2->addWidget(label);
+
         sSpeed = new QSlider(centralWidget);
         sSpeed->setObjectName(QStringLiteral("sSpeed"));
-        sSpeed->setMinimumSize(QSize(400, 0));
+        sSpeed->setMinimumSize(QSize(350, 0));
         sSpeed->setStyleSheet(QLatin1String("QSlider::groove:horizontal {\n"
 "	background-color: #505050;\n"
 "    height: 3px; \n"
@@ -544,8 +598,9 @@ public:
 "	width: 15px;\n"
 "	margin: -5px 0;\n"
 " }"));
+        sSpeed->setMaximum(200);
         sSpeed->setSingleStep(1);
-        sSpeed->setValue(50);
+        sSpeed->setValue(100);
         sSpeed->setOrientation(Qt::Horizontal);
 
         horizontalLayout_2->addWidget(sSpeed);
@@ -554,9 +609,15 @@ public:
 
         horizontalLayout_2->addItem(horizontalSpacer_5);
 
+        label_2 = new QLabel(centralWidget);
+        label_2->setObjectName(QStringLiteral("label_2"));
+        label_2->setFont(font1);
+
+        horizontalLayout_2->addWidget(label_2);
+
         sCardinalTens = new QSlider(centralWidget);
         sCardinalTens->setObjectName(QStringLiteral("sCardinalTens"));
-        sCardinalTens->setMinimumSize(QSize(400, 0));
+        sCardinalTens->setMinimumSize(QSize(350, 0));
         sCardinalTens->setStyleSheet(QLatin1String("QSlider::groove:horizontal {\n"
 "	background-color: #505050;\n"
 "    height: 3px; \n"
@@ -719,6 +780,11 @@ public:
         groupBox_2->setTitle(QApplication::translate("AppMainClass", "Rotate CP Z", Q_NULLPTR));
         rcpzadd->setText(QString());
         rcpzsub->setText(QString());
+        groupBox_4->setTitle(QApplication::translate("AppMainClass", "Train Pos", Q_NULLPTR));
+        trainPosForward->setText(QString());
+        trainPosBackward->setText(QString());
+        label->setText(QApplication::translate("AppMainClass", "Speed", Q_NULLPTR));
+        label_2->setText(QApplication::translate("AppMainClass", "CardinalTens", Q_NULLPTR));
         radioButton_1->setText(QApplication::translate("AppMainClass", "RadioButton", Q_NULLPTR));
         radioButton_2->setText(QApplication::translate("AppMainClass", "RadioButton", Q_NULLPTR));
         radioButton_3->setText(QApplication::translate("AppMainClass", "RadioButton", Q_NULLPTR));

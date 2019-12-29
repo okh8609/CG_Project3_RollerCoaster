@@ -10,9 +10,9 @@ AppMain::AppMain(QWidget *parent)
 	: QMainWindow(parent)
 {
 	ui.setupUi(this);
-	trainview = new TrainView();  
-	trainview->m_pTrack =  &m_Track;
-	setGeometry(100,25,1000,768);   
+	trainview = new TrainView();
+	trainview->m_pTrack = &m_Track;
+	setGeometry(100, 25, 1000, 768);
 	ui.mainLayout->layout()->addWidget(trainview);
 	trainview->installEventFilter(this);
 	this->canpan = false;
@@ -23,38 +23,51 @@ AppMain::AppMain(QWidget *parent)
 	this->trainview->isrun = false;
 	this->trainview->lastRedraw = 0;
 	this->trainview->trainSpeed = 0.5;
+	//this->trainview->trainSpeed = ui.sSpeed->value();
+	//this->trainview->trainCurrSpacing = ui.sSpeed->maximum();
 
-	setWindowTitle( "Roller Coaster" );
+	//背景音樂
+	ofstream ofs("ccccc.txt");
+	ofs << "ccc" << endl;
 
-	connect( ui.aLoadPath	,SIGNAL(triggered()),this,SLOT(LoadTrackPath())	);
-	connect( ui.aSavePath	,SIGNAL(triggered()),this,SLOT(SaveTrackPath())	);
-	connect( ui.aExit		,SIGNAL(triggered()),this,SLOT(ExitApp())		);
+	this->player = new QMediaPlayer;
+	//connect(this->player, SIGNAL(positionChanged(qint64)), this, SLOT(positionChanged(qint64)));
+	this->player->setMedia(QUrl::fromLocalFile("LazyRiverRag.mp3"));
+	this->player->setVolume(50);
+	this->player->play();
 
-	connect( ui.comboCamera	,SIGNAL(currentIndexChanged(QString)),this,SLOT(ChangeCameraType(QString)));
-	connect( ui.aWorld		,SIGNAL(triggered()),this,SLOT(ChangeCamToWorld())	);
-	connect( ui.aTop		,SIGNAL(triggered()),this,SLOT(ChangeCamToTop())	);
-	connect( ui.aTrain		,SIGNAL(triggered()),this,SLOT(ChangeCamToTrain())	);
 
-	connect( ui.comboCurve	,SIGNAL(currentIndexChanged(QString)),this,SLOT(ChangeCurveType(QString)));
-	connect( ui.aLinear		,SIGNAL(triggered()),this,SLOT(ChangeCurveToLinear())	);
-	connect( ui.aCardinal	,SIGNAL(triggered()),this,SLOT(ChangeCurveToCardinal())	);
-	connect( ui.aCubic		,SIGNAL(triggered()),this,SLOT(ChangeCurveToCubic())	);
+	setWindowTitle("Roller Coaster");
 
-	connect( ui.comboTrack	,SIGNAL(currentIndexChanged(QString)),this,SLOT(ChangeTrackType(QString)));
-	connect( ui.aLine		,SIGNAL(triggered()),this,SLOT(ChangeTrackToLine())		);
-	connect( ui.aTrack		,SIGNAL(triggered()),this,SLOT(ChangeTrackToTrack())	);
-	connect( ui.aRoad		,SIGNAL(triggered()),this,SLOT(ChangeTrackToRoad())		);
+	connect(ui.aLoadPath, SIGNAL(triggered()), this, SLOT(LoadTrackPath()));
+	connect(ui.aSavePath, SIGNAL(triggered()), this, SLOT(SaveTrackPath()));
+	connect(ui.aExit, SIGNAL(triggered()), this, SLOT(ExitApp()));
 
-	connect( ui.bPlay		,SIGNAL(clicked()),this,SLOT(SwitchPlayAndPause())				);
-	connect( ui.sSpeed		,SIGNAL(valueChanged(int)),this,SLOT(ChangeSpeedOfTrain(int))	);
-	connect( ui.sCardinalTens,SIGNAL(valueChanged(int)),this,SLOT(ChangeCardinalTens(int))	);
-	connect( ui.bAdd		,SIGNAL(clicked()),this,SLOT(AddControlPoint())					);
-	connect( ui.bDelete		,SIGNAL(clicked()),this,SLOT(DeleteControlPoint())				);
+	connect(ui.comboCamera, SIGNAL(currentIndexChanged(QString)), this, SLOT(ChangeCameraType(QString)));
+	connect(ui.aWorld, SIGNAL(triggered()), this, SLOT(ChangeCamToWorld()));
+	connect(ui.aTop, SIGNAL(triggered()), this, SLOT(ChangeCamToTop()));
+	connect(ui.aTrain, SIGNAL(triggered()), this, SLOT(ChangeCamToTrain()));
 
-	connect( ui.rcpxadd		,SIGNAL(clicked()),this,SLOT(RotateControlPointAddX())					);
-	connect( ui.rcpxsub		,SIGNAL(clicked()),this,SLOT(RotateControlPointSubX())				);
-	connect( ui.rcpzadd		,SIGNAL(clicked()),this,SLOT(RotateControlPointAddZ())					);
-	connect( ui.rcpzsub		,SIGNAL(clicked()),this,SLOT(RotateControlPointSubZ())				);
+	connect(ui.comboCurve, SIGNAL(currentIndexChanged(QString)), this, SLOT(ChangeCurveType(QString)));
+	connect(ui.aLinear, SIGNAL(triggered()), this, SLOT(ChangeCurveToLinear()));
+	connect(ui.aCardinal, SIGNAL(triggered()), this, SLOT(ChangeCurveToCardinal()));
+	connect(ui.aCubic, SIGNAL(triggered()), this, SLOT(ChangeCurveToCubic()));
+
+	connect(ui.comboTrack, SIGNAL(currentIndexChanged(QString)), this, SLOT(ChangeTrackType(QString)));
+	connect(ui.aLine, SIGNAL(triggered()), this, SLOT(ChangeTrackToLine()));
+	connect(ui.aTrack, SIGNAL(triggered()), this, SLOT(ChangeTrackToTrack()));
+	connect(ui.aRoad, SIGNAL(triggered()), this, SLOT(ChangeTrackToRoad()));
+
+	connect(ui.bPlay, SIGNAL(clicked()), this, SLOT(SwitchPlayAndPause()));
+	connect(ui.sSpeed, SIGNAL(valueChanged(int)), this, SLOT(ChangeSpeedOfTrain(int)));
+	connect(ui.sCardinalTens, SIGNAL(valueChanged(int)), this, SLOT(ChangeCardinalTens(int)));
+	connect(ui.bAdd, SIGNAL(clicked()), this, SLOT(AddControlPoint()));
+	connect(ui.bDelete, SIGNAL(clicked()), this, SLOT(DeleteControlPoint()));
+
+	connect(ui.rcpxadd, SIGNAL(clicked()), this, SLOT(RotateControlPointAddX()));
+	connect(ui.rcpxsub, SIGNAL(clicked()), this, SLOT(RotateControlPointSubX()));
+	connect(ui.rcpzadd, SIGNAL(clicked()), this, SLOT(RotateControlPointAddZ()));
+	connect(ui.rcpzsub, SIGNAL(clicked()), this, SLOT(RotateControlPointSubZ()));
 
 
 	connect(ui.pushButton, SIGNAL(clicked()), this, SLOT(pushButtonClick()));
@@ -71,17 +84,17 @@ bool AppMain::eventFilter(QObject *watched, QEvent *e) {
 		QMouseEvent *event = static_cast<QMouseEvent*> (e);
 		// Get the mouse position
 		float x, y;
-		trainview->arcball.getMouseNDC((float)event->localPos().x(), (float)event->localPos().y(), x,y);
+		trainview->arcball.getMouseNDC((float)event->localPos().x(), (float)event->localPos().y(), x, y);
 
 		// Compute the mouse position
 		trainview->arcball.down(x, y);
-		if(event->button()==Qt::LeftButton){
+		if (event->button() == Qt::LeftButton) {
 			trainview->doPick(event->localPos().x(), event->localPos().y());
 			this->isHover = true;
-			if(this->canpan)
+			if (this->canpan)
 				trainview->arcball.mode = trainview->arcball.Pan;
 		}
-		if(event->button()==Qt::RightButton){
+		if (event->button() == Qt::RightButton) {
 			trainview->arcball.mode = trainview->arcball.Rotate;
 		}
 	}
@@ -94,53 +107,53 @@ bool AppMain::eventFilter(QObject *watched, QEvent *e) {
 
 	if (e->type() == QEvent::Wheel) {
 		QWheelEvent *event = static_cast<QWheelEvent*> (e);
-		float zamt = (event->delta() < 0) ? 1.1f : 1/1.1f;
+		float zamt = (event->delta() < 0) ? 1.1f : 1 / 1.1f;
 		trainview->arcball.eyeZ *= zamt;
 	}
 
 	if (e->type() == QEvent::MouseMove) {
 		QMouseEvent *event = static_cast<QMouseEvent*> (e);
-		if(isHover && trainview->selectedCube >= 0){
+		if (isHover && trainview->selectedCube >= 0) {
 			ControlPoint* cp = &trainview->m_pTrack->points[trainview->selectedCube];
 
 			double r1x, r1y, r1z, r2x, r2y, r2z;
 			int x = event->localPos().x();
 			int iy = event->localPos().y();
-			double mat1[16],mat2[16];		// we have to deal with the projection matrices
+			double mat1[16], mat2[16];		// we have to deal with the projection matrices
 			int viewport[4];
 
 			glGetIntegerv(GL_VIEWPORT, viewport);
-			glGetDoublev(GL_MODELVIEW_MATRIX,mat1);
-			glGetDoublev(GL_PROJECTION_MATRIX,mat2);
+			glGetDoublev(GL_MODELVIEW_MATRIX, mat1);
+			glGetDoublev(GL_PROJECTION_MATRIX, mat2);
 
 			int y = viewport[3] - iy; // originally had an extra -1?
 
-			int i1 = gluUnProject((double) x, (double) y, .25, mat1, mat2, viewport, &r1x, &r1y, &r1z);
-			int i2 = gluUnProject((double) x, (double) y, .75, mat1, mat2, viewport, &r2x, &r2y, &r2z);
+			int i1 = gluUnProject((double)x, (double)y, .25, mat1, mat2, viewport, &r1x, &r1y, &r1z);
+			int i2 = gluUnProject((double)x, (double)y, .75, mat1, mat2, viewport, &r2x, &r2y, &r2z);
 
 			double rx, ry, rz;
-			mousePoleGo(r1x, r1y, r1z, r2x, r2y, r2z, 
-				static_cast<double>(cp->pos.x), 
+			mousePoleGo(r1x, r1y, r1z, r2x, r2y, r2z,
+				static_cast<double>(cp->pos.x),
 				static_cast<double>(cp->pos.y),
 				static_cast<double>(cp->pos.z),
 				rx, ry, rz,
 				false);
 
-			cp->pos.x = (float) rx;
-			cp->pos.y = (float) ry;
-			cp->pos.z = (float) rz;
+			cp->pos.x = (float)rx;
+			cp->pos.y = (float)ry;
+			cp->pos.z = (float)rz;
 		}
-		if(trainview->arcball.mode != trainview->arcball.None) { // we're taking the drags
-			float x,y;
-			trainview->arcball.getMouseNDC((float)event->localPos().x(), (float)event->localPos().y(),x,y);
-			trainview->arcball.computeNow(x,y);
+		if (trainview->arcball.mode != trainview->arcball.None) { // we're taking the drags
+			float x, y;
+			trainview->arcball.getMouseNDC((float)event->localPos().x(), (float)event->localPos().y(), x, y);
+			trainview->arcball.computeNow(x, y);
 		};
 	}
 
-	if(e->type() == QEvent::KeyPress){
-		 QKeyEvent *event = static_cast< QKeyEvent*> (e);
+	if (e->type() == QEvent::KeyPress) {
+		QKeyEvent *event = static_cast<QKeyEvent*> (e);
 		// Set up the mode
-		if (event->key() == Qt::Key_Alt) 
+		if (event->key() == Qt::Key_Alt)
 			this->canpan = true;
 	}
 
@@ -154,41 +167,41 @@ void AppMain::ExitApp()
 
 AppMain * AppMain::getInstance()
 {
-	if( !Instance )
+	if (!Instance)
 	{
 		Instance = new AppMain();
 		return Instance;
 	}
-	else 
+	else
 		return Instance;
 }
 
 void AppMain::ToggleMenuBar()
 {
-	ui.menuBar->setHidden( !ui.menuBar->isHidden() );
+	ui.menuBar->setHidden(!ui.menuBar->isHidden());
 }
 
 void AppMain::ToggleToolBar()
 {
-	ui.mainToolBar->setHidden( !ui.mainToolBar->isHidden() );
+	ui.mainToolBar->setHidden(!ui.mainToolBar->isHidden());
 }
 
 void AppMain::ToggleStatusBar()
 {
-	ui.statusBar->setHidden( !ui.statusBar->isHidden() );
+	ui.statusBar->setHidden(!ui.statusBar->isHidden());
 }
 
 void AppMain::LoadTrackPath()
 {
-	QString fileName = QFileDialog::getOpenFileName( 
+	QString fileName = QFileDialog::getOpenFileName(
 		this,
 		"OpenImage",
 		"./",
-		tr("Txt (*.txt)" )
-		);
+		tr("Txt (*.txt)")
+	);
 	QByteArray byteArray = fileName.toLocal8Bit();
 	const char* fname = byteArray.data();
-	if ( !fileName.isEmpty() )
+	if (!fileName.isEmpty())
 	{
 		this->m_Track.readPoints(fname);
 	}
@@ -196,16 +209,16 @@ void AppMain::LoadTrackPath()
 
 void AppMain::SaveTrackPath()
 {
-	QString fileName = QFileDialog::getSaveFileName( 
+	QString fileName = QFileDialog::getSaveFileName(
 		this,
 		"OpenImage",
 		"./",
-		tr("Txt (*.txt)" )
-		);
+		tr("Txt (*.txt)")
+	);
 
 	QByteArray byteArray = fileName.toLocal8Bit();
 	const char* fname = byteArray.data();
-	if ( !fileName.isEmpty() )
+	if (!fileName.isEmpty())
 	{
 		this->m_Track.writePoints(fname);
 	}
@@ -213,7 +226,7 @@ void AppMain::SaveTrackPath()
 
 void AppMain::TogglePanel()
 {
-	if( !ui.groupCamera->isHidden() )
+	if (!ui.groupCamera->isHidden())
 	{
 		ui.groupCamera->hide();
 		ui.groupCurve->hide();
@@ -231,36 +244,36 @@ void AppMain::TogglePanel()
 	}
 }
 
-void AppMain::ChangeCameraType( QString type )
+void AppMain::ChangeCameraType(QString type)
 {
-	if( type == "World" )
+	if (type == "World")
 	{
 		this->trainview->camera = 0;
 		update();
 	}
-	else if( type == "Top" )
+	else if (type == "Top")
 	{
 		this->trainview->camera = 1;
 		update();
 	}
-	else if( type == "Train" )
+	else if (type == "Train")
 	{
 		this->trainview->camera = 2;
 		update();
 	}
 }
 
-void AppMain::ChangeCurveType( QString type )
+void AppMain::ChangeCurveType(QString type)
 {
-	if( type == "Linear" )
+	if (type == "Linear")
 	{
 		this->trainview->curve = 0;
 	}
-	else if( type == "Cardinal" )
+	else if (type == "Cardinal")
 	{
 		this->trainview->curve = 1;
 	}
-	else if( type == "Cubic" )
+	else if (type == "Cubic")
 	{
 		this->trainview->curve = 2;
 	}
@@ -268,17 +281,17 @@ void AppMain::ChangeCurveType( QString type )
 
 }
 
-void AppMain::ChangeTrackType( QString type )
+void AppMain::ChangeTrackType(QString type)
 {
-	if( type == "Line" )
+	if (type == "Line")
 	{
 		this->trainview->track = 0;
 	}
-	else if( type == "Track" )
+	else if (type == "Track")
 	{
 		this->trainview->track = 1;
 	}
-	else if( type == "Road" )
+	else if (type == "Road")
 	{
 		this->trainview->track = 2;
 	}
@@ -286,7 +299,7 @@ void AppMain::ChangeTrackType( QString type )
 
 void AppMain::SwitchPlayAndPause()
 {
-	if( !this->trainview->isrun )
+	if (!this->trainview->isrun)
 	{
 		ui.bPlay->setIcon(QIcon(":/AppMain/Resources/Icons/play.ico"));
 		this->trainview->isrun = !this->trainview->isrun;
@@ -306,11 +319,12 @@ void AppMain::SwitchPlayAndPause()
 	//}
 }
 
-void AppMain::ChangeSpeedOfTrain( int val )
+void AppMain::ChangeSpeedOfTrain(int val)
 {
 	//火車的速度
 	//m_rollerCoaster->trainSpeed = m_rollerCoaster->MAX_TRAIN_SPEED * float(val) / 100.0f;
-	this->trainview->trainSpeed = float(val) / 100.0f;
+	this->trainview->trainSpeed = float(val) / 200.0f;
+	//this->trainview->trainSpeed = val;
 }
 
 void AppMain::ChangeCardinalTens(int val)
@@ -323,13 +337,13 @@ void AppMain::AddControlPoint() //!!
 	// get the number of points
 	size_t npts = this->m_Track.points.size();
 	// the number for the new point
-	size_t newidx = (this->trainview->selectedCube>=0) ? this->trainview->selectedCube : 0;
+	size_t newidx = (this->trainview->selectedCube >= 0) ? this->trainview->selectedCube : 0;
 
 	// pick a reasonable location
-	size_t previdx = (newidx + npts -1) % npts;
+	size_t previdx = (newidx + npts - 1) % npts;
 	Point3f npos = (this->m_Track.points[previdx].pos + this->m_Track.points[newidx].pos) * .5f;
 
-	this->m_Track.points.insert(this->m_Track.points.begin() + newidx,npos);
+	this->m_Track.points.insert(this->m_Track.points.begin() + newidx, npos);
 
 	// make it so that the train doesn't move - unless its affected by this control point
 	// it should stay between the same points
@@ -345,7 +359,8 @@ void AppMain::DeleteControlPoint()  //!!
 	if (this->m_Track.points.size() > 4) {
 		if (this->trainview->selectedCube >= 0) {
 			this->m_Track.points.erase(this->m_Track.points.begin() + this->trainview->selectedCube);
-		} else
+		}
+		else
 			this->m_Track.points.pop_back();
 	}
 	this->damageMe();
@@ -367,7 +382,7 @@ void AppMain::rollx(float dir)
 		this->m_Track.points[s].orient.z = si * old.y + co * old.z;
 	}
 	this->damageMe();
-} 
+}
 
 void AppMain::RotateControlPointAddX()
 {
@@ -393,7 +408,7 @@ void AppMain::rollz(float dir)
 		this->m_Track.points[s].orient.x = si * old.y + co * old.x;
 	}
 	this->damageMe();
-} 
+}
 
 void AppMain::RotateControlPointAddZ()
 {
@@ -450,25 +465,25 @@ void AppMain::ChangeTrackToRoad()
 	this->trainview->track = 2;
 }
 
-void AppMain::UpdateCameraState( int index )
+void AppMain::UpdateCameraState(int index)
 {
-	ui.aWorld->setChecked( (index==0)?true:false );
-	ui.aTop	 ->setChecked( (index==1)?true:false );
-	ui.aTrain->setChecked( (index==2)?true:false );
+	ui.aWorld->setChecked((index == 0) ? true : false);
+	ui.aTop->setChecked((index == 1) ? true : false);
+	ui.aTrain->setChecked((index == 2) ? true : false);
 }
 
-void AppMain::UpdateCurveState( int index )
+void AppMain::UpdateCurveState(int index)
 {
-	ui.aLinear	->setChecked( (index==0)?true:false );
-	ui.aCardinal->setChecked( (index==1)?true:false );
-	ui.aCubic	->setChecked( (index==2)?true:false );
+	ui.aLinear->setChecked((index == 0) ? true : false);
+	ui.aCardinal->setChecked((index == 1) ? true : false);
+	ui.aCubic->setChecked((index == 2) ? true : false);
 }
 
-void AppMain::UpdateTrackState( int index )
+void AppMain::UpdateTrackState(int index)
 {
-	ui.aLine ->setChecked( (index==0)?true:false );
-	ui.aTrack->setChecked( (index==1)?true:false );
-	ui.aRoad ->setChecked( (index==2)?true:false );
+	ui.aLine->setChecked((index == 0) ? true : false);
+	ui.aTrack->setChecked((index == 1) ? true : false);
+	ui.aRoad->setChecked((index == 2) ? true : false);
 }
 
 //************************************************************************
