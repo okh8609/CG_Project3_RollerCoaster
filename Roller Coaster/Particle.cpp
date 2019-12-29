@@ -19,7 +19,7 @@ void InitParticle(Particle& ep)
 	ep.r = float(rand() % 100) / 60.0f;
 	ep.life = 1.0f;//初始壽命
 	ep.fade = 0.005f + float(rand() % 21) / 10000.0f;//衰减速度
-	ep.size = 1;//大小  
+	ep.size = 0.5;//大小  
 
 	//位置 
 	ep.xpos = 75.0f - rand() % 150;
@@ -131,7 +131,7 @@ void DeleteParticle(Particle ** p)
 void Explosion1(Particle* par)
 {
 	Particle ep;
-	for (int i = 0; i < 75; i++)
+	for (int i = 0; i < 60; i++)
 	{
 		ep.b = float(rand() % 100) / 60.0f;
 		ep.g = float(rand() % 100) / 60.0f;
@@ -157,7 +157,7 @@ void Explosion1(Particle* par)
 void Explosion2(Particle* par)
 {
 	Particle ep;
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < 80; i++)
 	{
 		ep.b = par->b;
 		ep.g = par->g;

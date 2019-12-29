@@ -23,14 +23,21 @@ class MyObjLoader
 {
 public:
 	MyObjLoader() {}
-	MyObjLoader(const string &filePath, int size, QVector3D origin);
-	void render() const;
+	MyObjLoader(const string &filePath, int size);
+	void renderAt(QVector3D pos);
 
 	inline string getFileName() const { return _filePath; }
 	inline int numberOfSurface() const { return all_surface.size(); }
 	inline int numberOfPoint() const { return all_vertex.size(); }
+	inline void setPosition(QVector3D pos) { _origin = pos; }
+	void render() const;
+
+	inline float x() {return _origin.x();};
+	inline float y() {return _origin.y();};
+	inline float z() {return _origin.z();};
 
 private:
+
 	string _filePath;
 	QVector3D _origin;
 

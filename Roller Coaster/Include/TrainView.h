@@ -86,7 +86,9 @@ public:
 	QVector<QOpenGLTexture*> Textures;
 
 	Model *m;
-	MyObjLoader model;
+	MyObjLoader poepleObj;
+	MyObjLoader tunnelObj;
+
 
 	QVector3D trainPos; //火車的位置
 	QVector3D trainUp;  //火車上方

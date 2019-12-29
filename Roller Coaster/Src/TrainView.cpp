@@ -11,8 +11,8 @@ TrainView::TrainView(QWidget *parent) :
 	//m = new Model("C:/Users/KaiHao/Desktop/實驗室/3D身體調變/3D model obj file/obj_2/20190624_064424_262Y1Q6D.obj", 100, Point3d(0, 0, 0));
 
 
-	string path("C:/Users/KaiHao/Desktop/實驗室/3D身體調變/3D model obj file/obj_2/20190624_064424_262Y1Q6D.obj");
-	this->model = MyObjLoader(path, 50, QVector3D(0, 35, 0));
+	this->poepleObj = MyObjLoader("men1000.obj", 15); //人形 model
+	this->tunnelObj = MyObjLoader("tunnel.obj", 30);
 
 
 	trainPos = QVector3D(50, 5, 0); //火車的位置
@@ -209,10 +209,10 @@ void TrainView::paintGL()
 
 	drawStuff();
 
-	//畫人像OBJ
-	glColor3f(205.0 / 255.0, 149.0 / 255.0, 124.0 / 255.0);
-	glColor4f(0, 0.2, 0.5, 1);
-	model.render();
+
+	//畫山洞
+	glColor3ub(115,124,139);
+	this->tunnelObj.render();
 
 #pragma region 火車跑跑跑
 	trainNextPositionIndex %= trackMiddle.size();
@@ -221,7 +221,13 @@ void TrainView::paintGL()
 	trainDire = (nextPos - trainPos).normalized();
 	trainUp = QVector3D::crossProduct((trackRight.at(trainNextPositionIndex) - trackLeft.at(trainNextPositionIndex)), trainDire).normalized();
 	if (this->camera != 2)
+	{
 		drawTrain(trainPos, trainUp, trainDire);
+
+		//畫人像OBJ
+		glColor3f(205.0 / 255.0, 149.0 / 255.0, 124.0 / 255.0);
+		this->poepleObj.renderAt(trainPos + QVector3D(0, 0, 0));
+	}
 
 	cout << trainSpeed << endl;
 	//畫四角椎當火車頭 

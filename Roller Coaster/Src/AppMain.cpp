@@ -143,7 +143,35 @@ bool AppMain::eventFilter(QObject *watched, QEvent *e) {
 			cp->pos.y = (float)ry;
 			cp->pos.z = (float)rz;
 		}
-		if (trainview->arcball.mode != trainview->arcball.None) { // we're taking the drags
+		else if (isHover)
+		{
+
+			double r1x, r1y, r1z, r2x, r2y, r2z;
+			int x = event->localPos().x();
+			int iy = event->localPos().y();
+			double mat1[16], mat2[16];		// we have to deal with the projection matrices
+			int viewport[4];
+
+			glGetIntegerv(GL_VIEWPORT, viewport);
+			glGetDoublev(GL_MODELVIEW_MATRIX, mat1);
+			glGetDoublev(GL_PROJECTION_MATRIX, mat2);
+
+			int y = viewport[3] - iy; // originally had an extra -1?
+
+			int i1 = gluUnProject((double)x, (double)y, .25, mat1, mat2, viewport, &r1x, &r1y, &r1z);
+			int i2 = gluUnProject((double)x, (double)y, .75, mat1, mat2, viewport, &r2x, &r2y, &r2z);
+
+			double rx, ry, rz;
+			mousePoleGo(r1x, r1y, r1z, r2x, r2y, r2z,
+				static_cast<double>(this->trainview->tunnelObj.x()),
+				static_cast<double>(this->trainview->tunnelObj.y()),
+				static_cast<double>(this->trainview->tunnelObj.z()),
+				rx, ry, rz,										
+				false);
+
+			this->trainview->tunnelObj.setPosition(QVector3D(rx, ry, rz));
+		}
+		if (trainview->arcball.mode != trainview->arcball.None) { // we're taking the drags (¥ªÁä©ì¦² ±ÛÂàµø¨¤)
 			float x, y;
 			trainview->arcball.getMouseNDC((float)event->localPos().x(), (float)event->localPos().y(), x, y);
 			trainview->arcball.computeNow(x, y);

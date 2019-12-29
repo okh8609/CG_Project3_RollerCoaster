@@ -1,7 +1,7 @@
 #include "MyObjLoader.h"
 
 
-MyObjLoader::MyObjLoader(const string &filePath, int size, QVector3D origin) : _filePath(filePath), _origin(origin)
+MyObjLoader::MyObjLoader(const string &filePath, int size) : _filePath(filePath), _origin(QVector3D(0, 0, 0))
 {
 	fstream file(filePath, ios::in);
 	if (!file.is_open())
@@ -78,4 +78,10 @@ void MyObjLoader::render() const
 			glVertexVec3(all_vertex.at(surface.at(i)) * scale + _origin);
 		glEnd();
 	}
+}
+
+void MyObjLoader::renderAt(QVector3D pos)
+{
+	setPosition(pos);
+	this->render();
 }
