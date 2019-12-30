@@ -14,9 +14,9 @@
 #include "Square.h"
 #include "Model.h"
 #include <iostream>
-
 #include "Particle.h"
-#include "MyObjLoader.h"
+#include "Shader.h"
+#include "ObjLoader.h"
 
 class AppMain;
 class CTrack;
@@ -82,12 +82,14 @@ public:
 	Triangle* triangle;
 	Square* square;
 	GLfloat ProjectionMatrex[16];
+	//GLfloat ProjectionMatrex_[4][4];
 	GLfloat ModelViewMatrex[16];
+	//GLfloat ModelViewMatrex_[4][4];
 	QVector<QOpenGLTexture*> Textures;
 
 	Model *m;
-	MyObjLoader poepleObj;
-	MyObjLoader tunnelObj;
+	ObjLoader poepleObj;
+	ObjLoader tunnelObj;
 
 
 	QVector3D trainPos; //火車的位置
@@ -117,4 +119,8 @@ public:
 	float trainCurrSpacing=1; //距離下一步，還有多少距離
 
 };
+
+
+
+
 #endif // TRAINVIEW_H  

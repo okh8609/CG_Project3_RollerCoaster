@@ -19,11 +19,11 @@
 
 using namespace std;
 
-class MyObjLoader
+class ObjLoader
 {
 public:
-	MyObjLoader() {}
-	MyObjLoader(const string &filePath, int size);
+	ObjLoader() {}
+	ObjLoader(const string &filePath, int size);
 	void renderAt(QVector3D pos);
 
 	inline string getFileName() const { return _filePath; }

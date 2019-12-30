@@ -1,18 +1,19 @@
-﻿#include "TrainView.h"  
+﻿#include "TrainView.h" 
 
 
 TrainView::TrainView(QWidget *parent) :
 	QGLWidget(parent)
 {
-
 	resetArcball();
+
+
 
 	this->m = new Model("C:/Users/KaiHao/Desktop/Computer Graphics/DGMM-Lab/P3/arrow.obj", 50, Point3d(0, 0, 0));
 	//m = new Model("C:/Users/KaiHao/Desktop/實驗室/3D身體調變/3D model obj file/obj_2/20190624_064424_262Y1Q6D.obj", 100, Point3d(0, 0, 0));
 
 
-	this->poepleObj = MyObjLoader("men1000.obj", 15); //人形 model
-	this->tunnelObj = MyObjLoader("tunnel.obj", 30);
+	this->poepleObj = ObjLoader("men1000.obj", 15); //人形 model
+	this->tunnelObj = ObjLoader("tunnel.obj", 30);
 
 
 	trainPos = QVector3D(50, 5, 0); //火車的位置
@@ -259,11 +260,53 @@ void TrainView::paintGL()
 		unsetupShadows();
 	}
 
-#pragma region Shader
-
-
-
+#pragma region MY Shader
 	//Get modelview matrix
+	glGetFloatv(GL_MODELVIEW_MATRIX, ModelViewMatrex);
+	//Shader::Matrix16to4_4(ModelViewMatrex, ModelViewMatrex_);
+	//Get projection matrix
+	glGetFloatv(GL_PROJECTION_MATRIX, ProjectionMatrex);
+	//Shader::Matrix16to4_4(ProjectionMatrex, ProjectionMatrex_);
+
+
+	float vvv[] = {
+	-5, -25, 0.0f, 1.0f, 0.0f, 0.0f,
+	 5, -25, 0.0f, 0.0f, 1.0f, 0.0f,
+	 5,  5, 0.0f, 0.0f, 0.0f, 1.0f,
+	-5,  5, 0.0f, 1.0f, 1.0f, 1.0f
+	};
+
+	GLuint vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	GLuint vbo;
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vvv), vvv, GL_DYNAMIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0); //pos
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float))); //color
+	glEnableVertexAttribArray(1);
+
+	Shader *ss = new Shader(
+		R"(./Shader/Test.vert)",
+		R"(./Shader/Test.frag)");
+	ss->use();
+
+	glUniformMatrix4fv(glGetUniformLocation(ss->ID, "ModelViewMatrex"), 1, GL_FALSE, ModelViewMatrex);
+	glUniformMatrix4fv(glGetUniformLocation(ss->ID, "ProjectionMatrex"), 1, GL_FALSE, ProjectionMatrex);
+
+	glDrawArrays(GL_POLYGON, 0, 4);
+
+
+#pragma endregion
+
+#pragma region 助教的shader
+	// =================================================================================
+		//Get modelview matrix
 	glGetFloatv(GL_MODELVIEW_MATRIX, ModelViewMatrex);
 	//Get projection matrix
 	glGetFloatv(GL_PROJECTION_MATRIX, ProjectionMatrex);

@@ -1,7 +1,7 @@
-#include "MyObjLoader.h"
+#include "ObjLoader.h"
 
 
-MyObjLoader::MyObjLoader(const string &filePath, int size) : _filePath(filePath), _origin(QVector3D(0, 0, 0))
+ObjLoader::ObjLoader(const string &filePath, int size) : _filePath(filePath), _origin(QVector3D(0, 0, 0))
 {
 	fstream file(filePath, ios::in);
 	if (!file.is_open())
@@ -58,7 +58,7 @@ MyObjLoader::MyObjLoader(const string &filePath, int size) : _filePath(filePath)
 	scale = size / maximum(bounds.x(), bounds.y(), bounds.z());
 }
 
-void MyObjLoader::render() const
+void ObjLoader::render() const
 {
 	for (auto surface : all_surface)
 	{
@@ -80,7 +80,7 @@ void MyObjLoader::render() const
 	}
 }
 
-void MyObjLoader::renderAt(QVector3D pos)
+void ObjLoader::renderAt(QVector3D pos)
 {
 	setPosition(pos);
 	this->render();

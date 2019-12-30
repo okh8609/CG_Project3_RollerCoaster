@@ -5,7 +5,7 @@ Square::Square()
 }
 void Square::Init()
 {
-	InitShader("./Shader/Square.vs", "./Shader/Square.fs");
+	InitShader("./Shader/Square.vert", "./Shader/Square.frag");
 	InitVAO();
 	InitVBO();
 	//InitTexture();

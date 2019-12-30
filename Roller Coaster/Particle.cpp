@@ -1,5 +1,7 @@
 ﻿#include "Particle.h"
 
+
+
 Particle * Particles;
 UINT nOfFires = 0;
 

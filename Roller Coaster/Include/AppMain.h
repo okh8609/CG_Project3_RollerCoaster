@@ -7,7 +7,6 @@
 #include <QMediaPlayer>
 #include <QMediaPlaylist>
 #include "ui_AppMain.h"
-#include <qgl.h>
 #include "TrainView.h"  
 #include "Track.H"
 #include <fstream>

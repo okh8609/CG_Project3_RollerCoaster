@@ -62,7 +62,7 @@ void Triangle::Paint(GLfloat* ProjectionMatrix, GLfloat* ModelViewMatrix)
 }
 void Triangle::Init()
 {
-	InitShader("./Shader/Triangle.vs","./Shader/Triangle.fs");
+	InitShader("./Shader/Triangle.vert","./Shader/Triangle.frag");
 	InitVAO();
 	InitVBO();
 }
