@@ -31,8 +31,11 @@
 #include <math.h>
 
 #include <windows.h>
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <GL/glut.h>
 
 #include "Utilities/3DUtils.h"
 
@@ -195,6 +198,13 @@ void setupShadows(void)
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+#pragma region MY CODE
+
+	glewExperimental = GL_TRUE;
+	glewInit();
+
+#pragma endregion
 
 	glEnable(GL_STENCIL_TEST);
 	glStencilFunc(GL_EQUAL,0x1,0x1);

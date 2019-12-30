@@ -120,8 +120,6 @@ void TrainView::resetArcball()
 
 void TrainView::paintGL()
 {
-
-
 	//*********************************************************************
 	//
 	// * Set up basic opengl informaiton
@@ -172,10 +170,10 @@ void TrainView::paintGL()
 	// * set the light parameters
 	//
 	//**********************************************************************
-	GLfloat lightPosition1[] = { 0,1,1,0 }; // {50, 200.0, 50, 1.0};
+	GLfloat lightPosition1[] = { 0, 1, 1, 0 }; // {50, 200.0, 50, 1.0};
 	GLfloat lightPosition2[] = { 1, 0, 0, 0 };
 	GLfloat lightPosition3[] = { 0, -1, 0, 0 };
-	GLfloat yellowLight[] = { 0.5f, 0.5f, .1f, 1.0 };
+	GLfloat yellowLight[] = { 1.0f, 1.0f, 0.5f, 1.0 };
 	GLfloat whiteLight[] = { 1.0f, 1.0f, 1.0f, 1.0 };
 	GLfloat blueLight[] = { .1f,.1f,.3f,1.0 };
 	GLfloat grayLight[] = { .3f, .3f, .3f, 1.0 };
@@ -211,7 +209,7 @@ void TrainView::paintGL()
 
 
 	//畫山洞
-	glColor3ub(115,124,139);
+	glColor3ub(115, 124, 139);
 	this->tunnelObj.render();
 
 #pragma region 火車跑跑跑
@@ -229,7 +227,7 @@ void TrainView::paintGL()
 		this->poepleObj.renderAt(trainPos + QVector3D(0, 0, 0));
 	}
 
-	cout << trainSpeed << endl;
+	//cout << trainSpeed << endl;
 	//畫四角椎當火車頭 
 	if (this->isrun)
 	{
@@ -261,6 +259,10 @@ void TrainView::paintGL()
 		unsetupShadows();
 	}
 
+#pragma region Shader
+
+
+
 	//Get modelview matrix
 	glGetFloatv(GL_MODELVIEW_MATRIX, ModelViewMatrex);
 	//Get projection matrix
@@ -280,6 +282,7 @@ void TrainView::paintGL()
 	//Call square's render function, pass ModelViewMatrex and ProjectionMatrex
 	square->Paint(ProjectionMatrex, ModelViewMatrex);
 	square->End();
+#pragma endregion
 
 	//畫粒子
 	ProcessParticles();

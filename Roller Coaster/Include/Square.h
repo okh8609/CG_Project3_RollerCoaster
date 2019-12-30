@@ -29,9 +29,9 @@ public:
 public:
 	Square();
 	void Init();
+	void InitShader(QString vertexShaderPath,QString fragmentShaderPath);
 	void InitVAO();
 	void InitVBO();
-	void InitShader(QString vertexShaderPath,QString fragmentShaderPath);
 	void DimensionTransformation(GLfloat source[],GLfloat target[][4]);
 	void Begin();
 	void Paint(GLfloat* ProjectionMatrix, GLfloat* ModelViewMatrix);

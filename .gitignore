@@ -259,3 +259,7 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+
+# others
+glew-2.1.0
+glfw-3.3.bin.WIN64
