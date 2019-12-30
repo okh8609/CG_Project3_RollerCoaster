@@ -25,7 +25,7 @@ void InitParticle(Particle& ep)
 
 	//位置 
 	ep.xpos = 75.0f - rand() % 150;
-	ep.ypos = 25.0f;
+	ep.ypos = 60.0f;
 	ep.zpos = 75.0f - rand() % 150;
 
 	if (!int(ep.xpos))//x方向速度(z方向相同)

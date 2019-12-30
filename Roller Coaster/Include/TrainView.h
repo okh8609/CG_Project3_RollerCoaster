@@ -16,7 +16,9 @@
 #include <iostream>
 #include "Particle.h"
 #include "Shader.h"
+
 #include "ObjLoader.h"
+#include "ObjLoader_ForShader.h"
 
 class AppMain;
 class CTrack;
@@ -91,6 +93,12 @@ public:
 	ObjLoader poepleObj;
 	ObjLoader tunnelObj;
 
+	ObjLoader_ForShader mountain;
+	GLuint mountainVAO;
+	GLuint mountainVBO;
+	GLuint mountainTexture;
+	int mountainTextureWidth, mountainTextureHeight, mountainTextureChannels;
+	uchar *mountainTextureData;
 
 	QVector3D trainPos; //火車的位置
 	QVector3D trainUp;  //火車上方
@@ -116,7 +124,7 @@ public:
 	vector<QVector3D> trackLeft; //雙軌的左邊軌道點
 	vector<QVector3D> trackRight; //雙軌的右邊軌道點
 	UINT64 trainNextPositionIndex = 1;
-	float trainCurrSpacing=1; //距離下一步，還有多少距離
+	float trainCurrSpacing = 1; //距離下一步，還有多少距離
 
 };
 

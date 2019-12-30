@@ -1,22 +1,21 @@
 ﻿#include "TrainView.h" 
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 TrainView::TrainView(QWidget *parent) :
 	QGLWidget(parent)
 {
 	resetArcball();
 
-
-
 	this->m = new Model("C:/Users/KaiHao/Desktop/Computer Graphics/DGMM-Lab/P3/arrow.obj", 50, Point3d(0, 0, 0));
 	//m = new Model("C:/Users/KaiHao/Desktop/實驗室/3D身體調變/3D model obj file/obj_2/20190624_064424_262Y1Q6D.obj", 100, Point3d(0, 0, 0));
 
-
 	this->poepleObj = ObjLoader("men1000.obj", 15); //人形 model
-	this->tunnelObj = ObjLoader("tunnel.obj", 30);
+	this->tunnelObj = ObjLoader("tunnel2.obj", 55);
+	tunnelObj.setPosition(QVector3D(0, 20, 0));
 
-
-	trainPos = QVector3D(50, 5, 0); //火車的位置
+	trainPos = QVector3D(50, 35, 0); //火車的位置
 	trainUp = QVector3D(0, 1, 0);  //火車上方
 	trainDire = QVector3D(1, 0, 1);  //火車的前方
 }
@@ -35,6 +34,26 @@ void TrainView::initializeGL()
 	square->Init();
 	//Initialize texture 
 	initializeTexture();
+
+
+#pragma region 地形 Shader
+	mountain = ObjLoader_ForShader("mountain3000.obj", 200);
+	float* mountainVertex = mountain.all_vertex;
+
+	glGenVertexArrays(1, &mountainVAO);
+	glBindVertexArray(mountainVAO);
+
+	glGenBuffers(1, &mountainVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, mountainVBO);
+	glBufferData(GL_ARRAY_BUFFER, mountain.getVertexSize(), mountainVertex, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	glGenTextures(1, &mountainTexture);
+	stbi_set_flip_vertically_on_load(true);
+	mountainTextureData = stbi_load("./Textures/grass.jpg", &mountainTextureWidth, &mountainTextureHeight, &mountainTextureChannels, 0);
+#pragma endregion
 
 }
 void TrainView::initializeTexture()
@@ -260,48 +279,67 @@ void TrainView::paintGL()
 		unsetupShadows();
 	}
 
-#pragma region MY Shader
-	//Get modelview matrix
+#pragma region 地形 Shader
+	glBindVertexArray(mountainVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, mountainVBO);
+
+	Shader *mountainShader = new Shader(
+		R"(./Shader/Mountain.vert)",
+		R"(./Shader/Mountain.frag)");
+	mountainShader->use();
+
 	glGetFloatv(GL_MODELVIEW_MATRIX, ModelViewMatrex);
-	//Shader::Matrix16to4_4(ModelViewMatrex, ModelViewMatrex_);
-	//Get projection matrix
 	glGetFloatv(GL_PROJECTION_MATRIX, ProjectionMatrex);
-	//Shader::Matrix16to4_4(ProjectionMatrex, ProjectionMatrex_);
+	glUniformMatrix4fv(glGetUniformLocation(mountainShader->ID, "ModelViewMatrex"), 1, GL_FALSE, ModelViewMatrex);
+	glUniformMatrix4fv(glGetUniformLocation(mountainShader->ID, "ProjectionMatrex"), 1, GL_FALSE, ProjectionMatrex);
+
+	glBindTexture(GL_TEXTURE_2D, mountainTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mountainTextureWidth, mountainTextureHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, mountainTextureData);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	glDrawArrays(GL_TRIANGLES, 0, mountain.getVertexCount());
+#pragma endregion
+
+#pragma region MY Shader
+	////Get modelview matrix
+	//glGetFloatv(GL_MODELVIEW_MATRIX, ModelViewMatrex);
+	////Shader::Matrix16to4_4(ModelViewMatrex, ModelViewMatrex_);
+	////Get projection matrix
+	//glGetFloatv(GL_PROJECTION_MATRIX, ProjectionMatrex);
+	////Shader::Matrix16to4_4(ProjectionMatrex, ProjectionMatrex_);
 
 
-	float vvv[] = {
-	-5, -25, 0.0f, 1.0f, 0.0f, 0.0f,
-	 5, -25, 0.0f, 0.0f, 1.0f, 0.0f,
-	 5,  5, 0.0f, 0.0f, 0.0f, 1.0f,
-	-5,  5, 0.0f, 1.0f, 1.0f, 1.0f
-	};
+	//float vvv[] = {
+	//-5, -25, 0.0f, 1.0f, 0.0f, 0.0f,
+	// 5, -25, 0.0f, 0.0f, 1.0f, 0.0f,
+	// 5,  5, 0.0f, 0.0f, 0.0f, 1.0f,
+	//-5,  5, 0.0f, 1.0f, 1.0f, 1.0f
+	//};
 
-	GLuint vao;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
+	//GLuint vao;
+	//glGenVertexArrays(1, &vao);
+	//glBindVertexArray(vao);
 
-	GLuint vbo;
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	//GLuint vbo;
+	//glGenBuffers(1, &vbo);
+	//glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vvv), vvv, GL_DYNAMIC_DRAW);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(vvv), vvv, GL_DYNAMIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0); //pos
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float))); //color
-	glEnableVertexAttribArray(1);
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0); //pos
+	//glEnableVertexAttribArray(0);
+	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float))); //color
+	//glEnableVertexAttribArray(1);
 
-	Shader *ss = new Shader(
-		R"(./Shader/Test.vert)",
-		R"(./Shader/Test.frag)");
-	ss->use();
+	//Shader *sss = new Shader(
+	//	R"(./Shader/Test.vert)",
+	//	R"(./Shader/Test.frag)");
+	//ss->use();
 
-	glUniformMatrix4fv(glGetUniformLocation(ss->ID, "ModelViewMatrex"), 1, GL_FALSE, ModelViewMatrex);
-	glUniformMatrix4fv(glGetUniformLocation(ss->ID, "ProjectionMatrex"), 1, GL_FALSE, ProjectionMatrex);
+	//glUniformMatrix4fv(glGetUniformLocation(ss->ID, "ModelViewMatrex"), 1, GL_FALSE, ModelViewMatrex);
+	//glUniformMatrix4fv(glGetUniformLocation(ss->ID, "ProjectionMatrex"), 1, GL_FALSE, ProjectionMatrex);
 
-	glDrawArrays(GL_POLYGON, 0, 4);
-
-
+	//glDrawArrays(GL_POLYGON, 0, 4);
 #pragma endregion
 
 #pragma region 助教的shader
