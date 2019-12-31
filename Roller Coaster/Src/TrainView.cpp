@@ -37,18 +37,20 @@ void TrainView::initializeGL()
 
 
 #pragma region 地形 Shader
-	mountain = ObjLoader_ForShader("mountain3000.obj", 200);
-	float* mountainVertex = mountain.all_vertex;
+	mountain = ObjLoader_ForShader_withNormal("mountain3000_vn.obj", 200);
+	float* mountainVertex = mountain.all_data;
 
 	glGenVertexArrays(1, &mountainVAO);
 	glBindVertexArray(mountainVAO);
 
 	glGenBuffers(1, &mountainVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, mountainVBO);
-	glBufferData(GL_ARRAY_BUFFER, mountain.getVertexSize(), mountainVertex, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, mountain.getDataSize(), mountainVertex, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(mountain.getDataSize() / 2));
+	glEnableVertexAttribArray(1);
 
 	glGenTextures(1, &mountainTexture);
 	stbi_set_flip_vertically_on_load(true);
@@ -292,6 +294,13 @@ void TrainView::paintGL()
 	glGetFloatv(GL_PROJECTION_MATRIX, ProjectionMatrex);
 	glUniformMatrix4fv(glGetUniformLocation(mountainShader->ID, "ModelViewMatrex"), 1, GL_FALSE, ModelViewMatrex);
 	glUniformMatrix4fv(glGetUniformLocation(mountainShader->ID, "ProjectionMatrex"), 1, GL_FALSE, ProjectionMatrex);
+
+	auto t = (clock() / 50) % 100; //0~99
+	if (t < 50)
+		glUniform1f(glGetUniformLocation(mountainShader->ID, "clock"), t - 25);
+	else
+		glUniform1f(glGetUniformLocation(mountainShader->ID, "clock"), 75 - t);
+
 
 	glBindTexture(GL_TEXTURE_2D, mountainTexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mountainTextureWidth, mountainTextureHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, mountainTextureData);

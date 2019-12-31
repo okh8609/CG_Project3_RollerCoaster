@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include <string>
@@ -20,11 +21,11 @@
 
 using namespace std;
 
-class ObjLoader_ForShader
+class ObjLoader_ForShader_withNormal
 {
 public:
-	ObjLoader_ForShader();
-	ObjLoader_ForShader(const string &filePath, int size);
+	ObjLoader_ForShader_withNormal();
+	ObjLoader_ForShader_withNormal(const string &filePath, int size);
 	float *all_data;
 	int getDataSize();
 	int getVertexCount();
@@ -38,7 +39,8 @@ private:
 	QVector3D boundsMax = QVector3D(-1e9, -1e9, -1e9);
 
 	vector<QVector3D> all_v; //編號的頂點位置
-	vector<vector<int>> all_f; // 位置編號
+	vector<QVector3D> all_vn; //編號的頂點位置
+	vector<vector<pair<int,int>>> all_f; // 位置編號 法向量編號
 
 	template<typename T>
 	inline T maximum(T a, T b) { return a > b ? a : b; }

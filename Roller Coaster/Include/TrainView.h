@@ -19,6 +19,7 @@
 
 #include "ObjLoader.h"
 #include "ObjLoader_ForShader.h"
+#include "ObjLoader_ForShader_withNormal.h"
 
 class AppMain;
 class CTrack;
@@ -93,7 +94,7 @@ public:
 	ObjLoader poepleObj;
 	ObjLoader tunnelObj;
 
-	ObjLoader_ForShader mountain;
+	ObjLoader_ForShader_withNormal mountain;
 	GLuint mountainVAO;
 	GLuint mountainVBO;
 	GLuint mountainTexture;
