@@ -14,6 +14,7 @@
 #include "Square.h"
 #include "Model.h"
 #include <iostream>
+#include <tuple>
 #include "Particle.h"
 #include "Shader.h"
 
@@ -94,12 +95,29 @@ public:
 	ObjLoader poepleObj;
 	ObjLoader tunnelObj;
 
+	//mountain
 	ObjLoader_ForShader_withNormal mountain;
 	GLuint mountainVAO;
 	GLuint mountainVBO;
 	GLuint mountainTexture;
 	int mountainTextureWidth, mountainTextureHeight, mountainTextureChannels;
 	uchar *mountainTextureData;
+
+	//Skybox
+	float *skyboxVertices;
+	GLuint skyboxVAO;
+	GLuint skyboxVBO;
+	GLuint skyboxTexture;
+	vector<std::string> skyboxTexturePath{
+		"./Textures/skybox/right.jpg",
+		"./Textures/skybox/left.jpg",
+		"./Textures/skybox/top.jpg",
+		"./Textures/skybox/bottom.jpg",
+		"./Textures/skybox/front.jpg",
+		"./Textures/skybox/back.jpg"
+	};
+	vector<tuple<uchar*, int, int, int>> skyboxTextureData; //data,W,H,Channel
+
 
 	QVector3D trainPos; //火車的位置
 	QVector3D trainUp;  //火車上方

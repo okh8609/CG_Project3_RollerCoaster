@@ -57,6 +57,34 @@ void TrainView::initializeGL()
 	mountainTextureData = stbi_load("./Textures/grass.jpg", &mountainTextureWidth, &mountainTextureHeight, &mountainTextureChannels, 0);
 #pragma endregion
 
+#pragma region Skybox Shader
+	skyboxVertices = (float*)malloc(sizeof(float) * 36);
+	float _skyboxVertices[] = { -1.0f, 1.0f, -1.0f,-1.0f, -1.0f, -1.0f,1.0f, -1.0f, -1.0f,1.0f, -1.0f, -1.0f,1.0f, 1.0f, -1.0f,-1.0f, 1.0f, -1.0f,-1.0f, -1.0f, 1.0f,-1.0f, -1.0f, -1.0f,-1.0f, 1.0f, -1.0f,-1.0f, 1.0f, -1.0f,-1.0f, 1.0f, 1.0f,-1.0f, -1.0f, 1.0f,1.0f, -1.0f, -1.0f,1.0f, -1.0f, 1.0f,1.0f, 1.0f, 1.0f,1.0f, 1.0f, 1.0f,1.0f, 1.0f, -1.0f,1.0f, -1.0f, -1.0f,-1.0f, -1.0f, 1.0f,-1.0f, 1.0f, 1.0f,1.0f, 1.0f, 1.0f,1.0f, 1.0f, 1.0f,1.0f, -1.0f, 1.0f,-1.0f, -1.0f, 1.0f,-1.0f, 1.0f, -1.0f,1.0f, 1.0f, -1.0f,1.0f, 1.0f, 1.0f,1.0f, 1.0f, 1.0f,-1.0f, 1.0f, 1.0f,-1.0f, 1.0f, -1.0f,-1.0f, -1.0f, -1.0f,-1.0f, -1.0f, 1.0f,1.0f, -1.0f, -1.0f,1.0f, -1.0f, -1.0f,-1.0f, -1.0f, 1.0f,1.0f, -1.0f, 1.0f };
+	for (size_t i = 0; i < 36; i++)
+		skyboxVertices[i] = _skyboxVertices[i]*100;
+	//
+	glGenVertexArrays(1, &skyboxVAO);
+	glBindVertexArray(skyboxVAO);
+
+	glGenBuffers(1, &skyboxVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 36, &skyboxVertices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	//
+	glGenTextures(1, &skyboxTexture);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
+
+	int skyboxWidth, skyboxHeight, skyboxChannels;
+	for (unsigned int i = 0; i < skyboxTexturePath.size(); i++)
+	{
+		uchar *data = stbi_load(skyboxTexturePath[i].c_str(), &skyboxWidth, &skyboxHeight, &skyboxChannels, 0);
+		skyboxTextureData.push_back(tuple<uchar*, int, int, int>(data, skyboxWidth, skyboxHeight, skyboxChannels));
+	}
+
+#pragma endregion
+
 }
 void TrainView::initializeTexture()
 {
@@ -281,6 +309,40 @@ void TrainView::paintGL()
 		unsetupShadows();
 	}
 
+#pragma region Skybox Shader
+	glDepthMask(GL_FALSE);
+	Shader *skyboxShader = new Shader(
+		R"(./Shader/Skybox.vert)",
+		R"(./Shader/Skybox.frag)");
+	skyboxShader->use();
+
+	QMatrix4x4 ViewMatrex; //Constructs an identity matrix.
+	ViewMatrex.lookAt(trainPos, trainPos+ trainDire, trainUp);
+	//ViewMatrex = 0, ViewMatrex[7] = 0, ViewMatrex[11] = 0, ViewMatrex[12] = 0, ViewMatrex[13] = 0, ViewMatrex[14] = 0, ViewMatrex[15] = 0;
+	glUniformMatrix4fv(glGetUniformLocation(skyboxShader->ID, "ViewMatrex"), 1, GL_FALSE, ViewMatrex.data());
+
+	glGetFloatv(GL_PROJECTION_MATRIX, ProjectionMatrex);
+	glUniformMatrix4fv(glGetUniformLocation(skyboxShader->ID, "ProjectionMatrex"), 1, GL_FALSE, ProjectionMatrex);
+
+	glBindVertexArray(skyboxVAO);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
+
+	for (unsigned int i = 0; i < skyboxTexturePath.size(); i++)
+	{
+		const tuple<uchar*, int, int, int>& img = skyboxTextureData.at(i);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, std::get<1>(img), std::get<2>(img), 0, GL_RGB, GL_UNSIGNED_BYTE, std::get<0>(img));
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glDepthMask(GL_TRUE);
+
+#pragma endregion
+
 #pragma region 地形 Shader
 	glBindVertexArray(mountainVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, mountainVBO);
@@ -308,6 +370,8 @@ void TrainView::paintGL()
 
 	glDrawArrays(GL_TRIANGLES, 0, mountain.getVertexCount());
 #pragma endregion
+
+
 
 #pragma region MY Shader
 	////Get modelview matrix
