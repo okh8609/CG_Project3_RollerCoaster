@@ -104,9 +104,7 @@ public:
 	uchar *mountainTextureData;
 
 	//Skybox
-	float *skyboxVertices;
-	GLuint skyboxVAO;
-	GLuint skyboxVBO;
+	int skyboxSize = 550;
 	GLuint skyboxTexture;
 	vector<std::string> skyboxTexturePath{
 		"./Textures/skybox/right.jpg",
@@ -117,6 +115,30 @@ public:
 		"./Textures/skybox/back.jpg"
 	};
 	vector<tuple<uchar*, int, int, int>> skyboxTextureData; //data,W,H,Channel
+
+	// SineWave
+	ObjLoader_ForShader sineWave;
+	GLuint sineWaveVAO;
+	GLuint sineWaveVBO;
+
+	// Height Map (沒做成功.......)
+	ObjLoader_ForShader heightMap;
+	GLuint heightMapVAO;
+	GLuint heightMapVBO;
+	GLuint heightMapTexture;
+	int heightMapTextureWidth, heightMapTextureHeight, heightMapTextureChannels;
+	uchar *heightMapTextureData;
+
+	//tree
+	ObjLoader_ForShader_withNormal tree;
+	GLuint treeVAO;
+	GLuint treeVBO;
+	GLuint leafTexture;
+	int leafTextureWidth, leafTextureHeight, leafTextureChannels;
+	uchar *leafTextureData;
+	GLuint woodTexture;
+	int woodTextureWidth, woodTextureHeight, woodTextureChannels;
+	uchar *woodTextureData;
 
 
 	QVector3D trainPos; //火車的位置

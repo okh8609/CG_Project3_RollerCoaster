@@ -120,7 +120,7 @@ setProjection(bool doClear)
 
   // Compute the aspect ratio so we don't distort things
   double aspect = (wind->width() / wind->height());
-  gluPerspective(fieldOfView, aspect, .1, 1000);
+  gluPerspective(fieldOfView, aspect, .1, 1600);
 
   // Put the camera where we want it to be
   glMatrixMode(GL_MODELVIEW);

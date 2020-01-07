@@ -58,24 +58,6 @@ void TrainView::initializeGL()
 #pragma endregion
 
 #pragma region Skybox Shader
-	skyboxVertices = (float*)malloc(sizeof(float) * 36);
-	float _skyboxVertices[] = { -1.0f, 1.0f, -1.0f,-1.0f, -1.0f, -1.0f,1.0f, -1.0f, -1.0f,1.0f, -1.0f, -1.0f,1.0f, 1.0f, -1.0f,-1.0f, 1.0f, -1.0f,-1.0f, -1.0f, 1.0f,-1.0f, -1.0f, -1.0f,-1.0f, 1.0f, -1.0f,-1.0f, 1.0f, -1.0f,-1.0f, 1.0f, 1.0f,-1.0f, -1.0f, 1.0f,1.0f, -1.0f, -1.0f,1.0f, -1.0f, 1.0f,1.0f, 1.0f, 1.0f,1.0f, 1.0f, 1.0f,1.0f, 1.0f, -1.0f,1.0f, -1.0f, -1.0f,-1.0f, -1.0f, 1.0f,-1.0f, 1.0f, 1.0f,1.0f, 1.0f, 1.0f,1.0f, 1.0f, 1.0f,1.0f, -1.0f, 1.0f,-1.0f, -1.0f, 1.0f,-1.0f, 1.0f, -1.0f,1.0f, 1.0f, -1.0f,1.0f, 1.0f, 1.0f,1.0f, 1.0f, 1.0f,-1.0f, 1.0f, 1.0f,-1.0f, 1.0f, -1.0f,-1.0f, -1.0f, -1.0f,-1.0f, -1.0f, 1.0f,1.0f, -1.0f, -1.0f,1.0f, -1.0f, -1.0f,-1.0f, -1.0f, 1.0f,1.0f, -1.0f, 1.0f };
-	for (size_t i = 0; i < 36; i++)
-		skyboxVertices[i] = _skyboxVertices[i]*100;
-	//
-	glGenVertexArrays(1, &skyboxVAO);
-	glBindVertexArray(skyboxVAO);
-
-	glGenBuffers(1, &skyboxVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 36, &skyboxVertices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	//
-	glGenTextures(1, &skyboxTexture);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
-
 	int skyboxWidth, skyboxHeight, skyboxChannels;
 	for (unsigned int i = 0; i < skyboxTexturePath.size(); i++)
 	{
@@ -83,8 +65,72 @@ void TrainView::initializeGL()
 		skyboxTextureData.push_back(tuple<uchar*, int, int, int>(data, skyboxWidth, skyboxHeight, skyboxChannels));
 	}
 
+	glGenTextures(1, &skyboxTexture);
 #pragma endregion
 
+#pragma region Sine Wave
+	sineWave = ObjLoader_ForShader("plane1000.obj", 90);
+	float* sineWaveVertex = sineWave.all_data;
+
+	glGenVertexArrays(1, &sineWaveVAO);
+	glBindVertexArray(sineWaveVAO);
+
+	glGenBuffers(1, &sineWaveVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, sineWaveVBO);
+	glBufferData(GL_ARRAY_BUFFER, sineWave.getDataSize(), sineWaveVertex, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+#pragma endregion
+
+#pragma region Height Map
+	heightMap = ObjLoader_ForShader("plane1000.obj", 50);
+	float* heightMapVertex = heightMap.all_data;
+
+	glGenVertexArrays(1, &heightMapVAO);
+	glBindVertexArray(heightMapVAO);
+
+	glGenBuffers(1, &heightMapVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, heightMapVBO);
+	glBufferData(GL_ARRAY_BUFFER, heightMap.getDataSize(), heightMapVertex, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	glGenTextures(1, &heightMapTexture);
+	stbi_set_flip_vertically_on_load(true);
+	heightMapTextureData = stbi_load("./Textures/water.jpg", &heightMapTextureWidth, &heightMapTextureHeight, &heightMapTextureChannels, 0);
+#pragma endregion
+
+#pragma region 樹
+	tree = ObjLoader_ForShader_withNormal("tree750_vn.obj", 60);
+	float* treeVertex = tree.all_data;
+
+	glGenVertexArrays(1, &treeVAO);
+	glBindVertexArray(treeVAO);
+
+	glGenBuffers(1, &treeVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, treeVBO);
+	glBufferData(GL_ARRAY_BUFFER, tree.getDataSize(), treeVertex, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(tree.getDataSize() / 2));
+	glEnableVertexAttribArray(1);
+
+	glGenTextures(1, &leafTexture);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, leafTexture);
+	stbi_set_flip_vertically_on_load(true);
+	leafTextureData = stbi_load("./Textures/leaf.jpg", &leafTextureWidth, &leafTextureHeight, &leafTextureChannels, 0);
+
+	glGenTextures(1, &woodTexture);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, woodTexture);
+	stbi_set_flip_vertically_on_load(true);
+	woodTextureData = stbi_load("./Textures/wood.jpg", &woodTextureWidth, &woodTextureHeight, &woodTextureChannels, 0);
+
+#pragma endregion
 }
 void TrainView::initializeTexture()
 {
@@ -309,40 +355,6 @@ void TrainView::paintGL()
 		unsetupShadows();
 	}
 
-#pragma region Skybox Shader
-	glDepthMask(GL_FALSE);
-	Shader *skyboxShader = new Shader(
-		R"(./Shader/Skybox.vert)",
-		R"(./Shader/Skybox.frag)");
-	skyboxShader->use();
-
-	QMatrix4x4 ViewMatrex; //Constructs an identity matrix.
-	ViewMatrex.lookAt(trainPos, trainPos+ trainDire, trainUp);
-	//ViewMatrex = 0, ViewMatrex[7] = 0, ViewMatrex[11] = 0, ViewMatrex[12] = 0, ViewMatrex[13] = 0, ViewMatrex[14] = 0, ViewMatrex[15] = 0;
-	glUniformMatrix4fv(glGetUniformLocation(skyboxShader->ID, "ViewMatrex"), 1, GL_FALSE, ViewMatrex.data());
-
-	glGetFloatv(GL_PROJECTION_MATRIX, ProjectionMatrex);
-	glUniformMatrix4fv(glGetUniformLocation(skyboxShader->ID, "ProjectionMatrex"), 1, GL_FALSE, ProjectionMatrex);
-
-	glBindVertexArray(skyboxVAO);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
-
-	for (unsigned int i = 0; i < skyboxTexturePath.size(); i++)
-	{
-		const tuple<uchar*, int, int, int>& img = skyboxTextureData.at(i);
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, std::get<1>(img), std::get<2>(img), 0, GL_RGB, GL_UNSIGNED_BYTE, std::get<0>(img));
-	}
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-	glDepthMask(GL_TRUE);
-
-#pragma endregion
-
 #pragma region 地形 Shader
 	glBindVertexArray(mountainVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, mountainVBO);
@@ -363,15 +375,213 @@ void TrainView::paintGL()
 	else
 		glUniform1f(glGetUniformLocation(mountainShader->ID, "clock"), 75 - t);
 
-
 	glBindTexture(GL_TEXTURE_2D, mountainTexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mountainTextureWidth, mountainTextureHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, mountainTextureData);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	glDrawArrays(GL_TRIANGLES, 0, mountain.getVertexCount());
+
+	glUseProgram(0); // un-UseProgram
 #pragma endregion
 
+#pragma region Skybox Shader
+	glDisable(GL_LIGHTING);
+	glEnable(GL_TEXTURE_2D);
+	//glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glBindTexture(GL_TEXTURE_2D, skyboxTexture);
+	tuple<uchar*, int, int, int> SkyboxImg;
 
+	// right.jpg"
+	SkyboxImg = skyboxTextureData.at(0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, std::get<1>(SkyboxImg), std::get<2>(SkyboxImg), 0, GL_RGB, GL_UNSIGNED_BYTE, std::get<0>(SkyboxImg));
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glBegin(GL_QUADS);
+	glTexCoord2f(1.0f, 0.0f);
+	glVertex3f(-skyboxSize, -skyboxSize, skyboxSize);
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex3f(skyboxSize, -skyboxSize, skyboxSize);
+	glTexCoord2f(0.0f, 1.0f);
+	glVertex3f(skyboxSize, skyboxSize, skyboxSize);
+	glTexCoord2f(1.0f, 1.0f);
+	glVertex3f(-skyboxSize, skyboxSize, skyboxSize);
+	glEnd();
+	glFlush();
+
+	// left.jpg"
+	SkyboxImg = skyboxTextureData.at(1);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, std::get<1>(SkyboxImg), std::get<2>(SkyboxImg), 0, GL_RGB, GL_UNSIGNED_BYTE, std::get<0>(SkyboxImg));
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex3f(-skyboxSize, -skyboxSize, -skyboxSize);
+	glTexCoord2f(1.0f, 0.0f);
+	glVertex3f(skyboxSize, -skyboxSize, -skyboxSize);
+	glTexCoord2f(1.0f, 1.0f);
+	glVertex3f(skyboxSize, skyboxSize, -skyboxSize);
+	glTexCoord2f(0.0f, 1.0f);
+	glVertex3f(-skyboxSize, skyboxSize, -skyboxSize);
+	glEnd();
+	glFlush();
+
+	// top.jpg"
+	SkyboxImg = skyboxTextureData.at(2);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, std::get<1>(SkyboxImg), std::get<2>(SkyboxImg), 0, GL_RGB, GL_UNSIGNED_BYTE, std::get<0>(SkyboxImg));
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 1.0f);
+	glVertex3f(-skyboxSize, skyboxSize, -skyboxSize);
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex3f(skyboxSize, skyboxSize, -skyboxSize);
+	glTexCoord2f(1.0f, 0.0f);
+	glVertex3f(skyboxSize, skyboxSize, skyboxSize);
+	glTexCoord2f(1.0f, 1.0f);
+	glVertex3f(-skyboxSize, skyboxSize, skyboxSize);
+	glEnd();
+	glFlush();
+
+	// bottom.jpg"
+	SkyboxImg = skyboxTextureData.at(3);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, std::get<1>(SkyboxImg), std::get<2>(SkyboxImg), 0, GL_RGB, GL_UNSIGNED_BYTE, std::get<0>(SkyboxImg));
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex3f(-skyboxSize, -skyboxSize, -skyboxSize);
+	glTexCoord2f(0.0f, 1.0f);
+	glVertex3f(skyboxSize, -skyboxSize, -skyboxSize);
+	glTexCoord2f(1.0f, 1.0f);
+	glVertex3f(skyboxSize, -skyboxSize, skyboxSize);
+	glTexCoord2f(1.0f, 0.0f);
+	glVertex3f(-skyboxSize, -skyboxSize, skyboxSize);
+	glEnd();
+	glFlush();
+
+	// front.jpg"
+	SkyboxImg = skyboxTextureData.at(4);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, std::get<1>(SkyboxImg), std::get<2>(SkyboxImg), 0, GL_RGB, GL_UNSIGNED_BYTE, std::get<0>(SkyboxImg));
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex3f(skyboxSize, -skyboxSize, -skyboxSize);
+	glTexCoord2f(0.0f, 1.0f);
+	glVertex3f(skyboxSize, skyboxSize, -skyboxSize);
+	glTexCoord2f(1.0f, 1.0f);
+	glVertex3f(skyboxSize, skyboxSize, skyboxSize);
+	glTexCoord2f(1.0f, 0.0f);
+	glVertex3f(skyboxSize, -skyboxSize, skyboxSize);
+	glEnd();
+	glFlush();
+
+	// back.jpg"
+	SkyboxImg = skyboxTextureData.at(5);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, std::get<1>(SkyboxImg), std::get<2>(SkyboxImg), 0, GL_RGB, GL_UNSIGNED_BYTE, std::get<0>(SkyboxImg));
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glBegin(GL_QUADS);
+	glTexCoord2f(1.0f, 0.0f);
+	glVertex3f(-skyboxSize, -skyboxSize, -skyboxSize);
+	glTexCoord2f(1.0f, 1.0f);
+	glVertex3f(-skyboxSize, skyboxSize, -skyboxSize);
+	glTexCoord2f(0.0f, 1.0f);
+	glVertex3f(-skyboxSize, skyboxSize, skyboxSize);
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex3f(-skyboxSize, -skyboxSize, skyboxSize);
+	glEnd();
+	glFlush();
+	glEnable(GL_LIGHTING);
+#pragma endregion
+
+#pragma region SineWave
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glBindVertexArray(sineWaveVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, sineWaveVBO);
+
+	Shader *sineWaveShader = new Shader(
+		R"(./Shader/SineWave.vert)",
+		R"(./Shader/SineWave.frag)");
+	sineWaveShader->use();
+
+	glGetFloatv(GL_MODELVIEW_MATRIX, ModelViewMatrex);
+	glGetFloatv(GL_PROJECTION_MATRIX, ProjectionMatrex);
+	glUniformMatrix4fv(glGetUniformLocation(sineWaveShader->ID, "ModelViewMatrex"), 1, GL_FALSE, ModelViewMatrex);
+	glUniformMatrix4fv(glGetUniformLocation(sineWaveShader->ID, "ProjectionMatrex"), 1, GL_FALSE, ProjectionMatrex);
+	glUniform1f(glGetUniformLocation(sineWaveShader->ID, "clock"), clock());
+
+	glDrawArrays(GL_TRIANGLES, 0, sineWave.getVertexCount());
+	glDisable(GL_BLEND);
+
+	glUseProgram(0); // un-UseProgram
+#pragma endregion
+
+#pragma region Height Map
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glBindVertexArray(heightMapVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, heightMapVBO);
+
+	Shader *heightMapShader = new Shader(
+		R"(./Shader/HeightMap.vert)",
+		R"(./Shader/HeightMap.frag)");
+	heightMapShader->use();
+
+	glGetFloatv(GL_MODELVIEW_MATRIX, ModelViewMatrex);
+	glGetFloatv(GL_PROJECTION_MATRIX, ProjectionMatrex);
+	glUniformMatrix4fv(glGetUniformLocation(heightMapShader->ID, "ModelViewMatrex"), 1, GL_FALSE, ModelViewMatrex);
+	glUniformMatrix4fv(glGetUniformLocation(heightMapShader->ID, "ProjectionMatrex"), 1, GL_FALSE, ProjectionMatrex);
+	glUniform1f(glGetUniformLocation(heightMapShader->ID, "clock"), clock());
+
+	glBindTexture(GL_TEXTURE_2D, heightMapTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, heightMapTextureWidth, heightMapTextureHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, heightMapTextureData);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	glDrawArrays(GL_TRIANGLES, 0, heightMap.getVertexCount());
+	glDisable(GL_BLEND);
+
+	glUseProgram(0); // un-UseProgram
+#pragma endregion
+
+#pragma region 樹
+	glBindVertexArray(treeVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, treeVBO);
+
+	Shader *treeShader = new Shader(
+		R"(./Shader/Tree.vert)",
+		R"(./Shader/Tree.frag)");
+	treeShader->use();
+
+	glGetFloatv(GL_MODELVIEW_MATRIX, ModelViewMatrex);
+	glGetFloatv(GL_PROJECTION_MATRIX, ProjectionMatrex);
+	glUniformMatrix4fv(glGetUniformLocation(treeShader->ID, "ModelViewMatrex"), 1, GL_FALSE, ModelViewMatrex);
+	glUniformMatrix4fv(glGetUniformLocation(treeShader->ID, "ProjectionMatrex"), 1, GL_FALSE, ProjectionMatrex);
+
+	
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, leafTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, leafTextureWidth, leafTextureHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, leafTextureData);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, woodTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, woodTextureWidth, woodTextureHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, woodTextureData);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glUniform1i(glGetUniformLocation(treeShader->ID, "leaf"), 0);
+	glUniform1i(glGetUniformLocation(treeShader->ID, "wood"), 1);
+
+	glActiveTexture(GL_TEXTURE1);
+	glDisable(GL_TEXTURE_2D);
+	//glActiveTexture(GL_TEXTURE0);
+
+
+	glDrawArrays(GL_TRIANGLES, 0, tree.getVertexCount());
+
+	glUseProgram(0); // un-UseProgram
+#pragma endregion
 
 #pragma region MY Shader
 	////Get modelview matrix
@@ -501,7 +711,7 @@ void TrainView::setProjection()
 	else if (this->camera == 2) {
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		gluPerspective(120, aspect, .1, 1000);
+		gluPerspective(120, aspect, .1, 1600);
 
 
 		glMatrixMode(GL_MODELVIEW);
@@ -534,7 +744,7 @@ void TrainView::setProjection()
 		trainCamView(this, aspect);
 #endif
 		update();
-	}
+}
 }
 
 //************************************************************************

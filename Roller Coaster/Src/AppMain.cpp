@@ -70,7 +70,7 @@ AppMain::AppMain(QWidget *parent)
 	connect(ui.rcpzsub, SIGNAL(clicked()), this, SLOT(RotateControlPointSubZ()));
 
 
-	connect(ui.pushButton, SIGNAL(clicked()), this, SLOT(pushButtonClick()));
+	//connect(ui.pushButton, SIGNAL(clicked()), this, SLOT(pushButtonClick()));
 
 }
 
